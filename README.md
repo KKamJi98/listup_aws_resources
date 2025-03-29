@@ -1,0 +1,1 @@
+# listup_aws_resources
