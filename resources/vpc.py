@@ -1,4 +1,5 @@
 import pandas as pd
+from utils.name_tag import extract_name_tag
 
 def get_raw_data(session, region):
     """
@@ -14,13 +15,15 @@ def get_filtered_data(raw_data):
     """
     rows = []
     for vpc in raw_data.get('Vpcs', []):
+        name = extract_name_tag(vpc.get('Tags', []))
+        if not name:
+            name = "N/A"
         row = {
+            'Name': name,
             'VpcId': vpc.get('VpcId'),
             'State': vpc.get('State'),
             'CidrBlock': vpc.get('CidrBlock'),
             'IsDefault': vpc.get('IsDefault'),
-            # 태그는 배열 형태이므로, 필요하면 Tag 중 Name만 가져오는 식으로 처리
-            'NameTag': extract_name_tag(vpc.get('Tags', []))
         }
         rows.append(row)
     return pd.DataFrame(rows)

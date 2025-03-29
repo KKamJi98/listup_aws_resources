@@ -1,4 +1,5 @@
 import pandas as pd
+from utils.name_tag import extract_name_tag
 
 def get_raw_data(session, region):
     """
@@ -18,7 +19,11 @@ def get_filtered_data(raw_data):
     reservations = raw_data.get('Reservations', [])
     for r in reservations:
         for inst in r.get('Instances', []):
+            name = extract_name_tag(inst.get('Tags', []))
+            if not name:
+                name = "N/A"
             row = {
+                'Name': name,
                 'InstanceId': inst.get('InstanceId'),
                 'InstanceType': inst.get('InstanceType'),
                 'State': inst.get('State', {}).get('Name'),

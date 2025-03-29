@@ -1,12 +1,13 @@
 # listup_aws_resources
 
-이 프로젝트는 AWS 리소스를 나열하고 정리하는 도구입니다. 특정 AWS 계정에서 자주 사용하는 리소스의 상태를 조회하여 엑셀 및 JSON 형태로 데이터를 내보냅니다.
+AWS 리소스를 나열하고 정리하는 스크립트입니다. 특정 AWS 계정에서 자주 사용하는 리소스의 상태를 조회하여 엑셀 및 JSON 형태로 데이터를 내보냅니다.
+
+추가하고 싶은 AWS 리소스가 있다면, `resources` 폴더에 새로운 리소스를 정의할 수 있습니다. (PR 환영합니다!)
 
 ## 기능
 
 - 다양한 AWS 리소스(EKS, EC2, S3, RDS, DynamoDB, Route53, 등)를 손쉽게 조회할 수 있습니다.
 - 조회된 결과는 Excel 및 JSON 형식으로 저장됩니다.
-- Python으로 작성되었으며, 관리 및 확장이 용이합니다.
 
 ## 프로젝트 구조
 
@@ -45,7 +46,7 @@ listup_aws_resources/
 1. 저장소를 클론합니다.
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/KKamJi98/listup_aws_resources.git
 cd listup_aws_resources
 ```
 
@@ -73,6 +74,5 @@ poetry run python listup_aws_resources.py
 
 - 조회된 리소스 목록은 `data` 폴더 내에 Excel 및 JSON 형식으로 저장됩니다.
 
-## 추가 정보
-
-- 추가하고 싶은 AWS 리소스가 있다면, `resources` 폴더에 새로운 리소스를 정의할 수 있습니다. (PR 환영합니다!)
+JSON -> 원본
+Excel -> 가공된 데이터

@@ -1,6 +1,7 @@
 # resources/subnets.py
 
 import pandas as pd
+from utils.name_tag import extract_name_tag
 
 def get_raw_data(session, region):
     """
@@ -17,7 +18,11 @@ def get_filtered_data(raw_data):
     """
     rows = []
     for subnet in raw_data.get('Subnets', []):
+        name = extract_name_tag(subnet.get('Tags', []))
+        if not name:
+            name = "N/A"
         row = {
+            'Name': name,
             'SubnetId': subnet.get('SubnetId'),
             'VpcId': subnet.get('VpcId'),
             'CidrBlock': subnet.get('CidrBlock'),

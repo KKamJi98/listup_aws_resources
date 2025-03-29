@@ -206,7 +206,7 @@ def main():
 
     # --- S3 Buckets (Global) ---
     print("\n=== Collecting S3 Buckets (global) ===")
-    s3_session = boto3.Session()
+    s3_session = boto3.Session(region_name="us-east-1")
     s3_data_raw = s3_raw(s3_session)
     s3_data_filtered = s3_filtered(s3_data_raw)
     all_raw_data['S3'] = s3_data_raw

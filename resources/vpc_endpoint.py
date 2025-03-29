@@ -1,21 +1,19 @@
 import pandas as pd
+from utils.name_tag import extract_name_tag
 
 def get_raw_data(session, region):
-    """
-    VPC 엔드포인트 정보를 조회합니다.
-    """
     client = session.client('ec2', region_name=region)
     response = client.describe_vpc_endpoints()
     return response
 
 def get_filtered_data(raw_data):
-    """
-    VPC 엔드포인트의 주요 필드를 추출합니다:
-      - VpcEndpointId, VpcId, ServiceName, State, RouteTableIds, PolicyDocument
-    """
     rows = []
     for ep in raw_data.get('VpcEndpoints', []):
+        name = extract_name_tag(ep.get('Tags'))
+        if not name:
+            name = "N/A"
         row = {
+            'Name': name,
             'VpcEndpointId': ep.get('VpcEndpointId'),
             'VpcId': ep.get('VpcId'),
             'ServiceName': ep.get('ServiceName'),

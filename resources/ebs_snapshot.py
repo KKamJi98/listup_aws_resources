@@ -1,4 +1,5 @@
 import pandas as pd
+from utils.name_tag import extract_name_tag
 
 def get_raw_data(session, region):
     """
@@ -16,6 +17,9 @@ def get_filtered_data(raw_data):
     """
     rows = []
     for snap in raw_data.get('Snapshots', []):
+        name =  extract_name_tag(snap.get('Tags', []))
+        if not name:
+            name = "N/A"
         row = {
             'SnapshotId': snap.get('SnapshotId'),
             'VolumeId': snap.get('VolumeId'),
