@@ -3,8 +3,6 @@ import pandas as pd
 def get_raw_data(session, region):
     """
     EBS Volume 정보를 조회합니다.
-    boto3 클라이언트를 사용하여 describe_volumes()를 호출하고,
-    원본 JSON 응답을 그대로 반환합니다.
     """
     ec2_client = session.client('ec2', region_name=region)
     response = ec2_client.describe_volumes()
@@ -13,15 +11,6 @@ def get_raw_data(session, region):
 def get_filtered_data(raw_data):
     """
     원본 JSON 응답에서 EBS Volume의 주요 필드를 추출하여 DataFrame으로 반환합니다.
-    추출 필드:
-      - VolumeId
-      - Name (태그 'Name'이 있으면 사용, 없으면 VolumeId)
-      - Size (GB)
-      - VolumeType
-      - State
-      - AvailabilityZone
-      - CreateTime
-      - Tags (전체 태그 정보를 "Key=Value;Key=Value" 형태로 병합)
     """
     rows = []
     for volume in raw_data.get('Volumes', []):

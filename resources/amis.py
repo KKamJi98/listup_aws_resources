@@ -2,8 +2,8 @@ import pandas as pd
 
 def get_raw_data(session, region):
     """
-    현재 계정이 소유한 AMI 이미지를 조회합니다.
-    describe_images() 호출 시 Owners=['self']를 지정합니다.
+    현재 계정이 소유한 AMI 이미지를 조회
+    describe_images() 호출 시 Owners=['self']를 지정
     """
     client = session.client('ec2', region_name=region)
     response = client.describe_images(Owners=['self'])
@@ -11,8 +11,7 @@ def get_raw_data(session, region):
 
 def get_filtered_data(raw_data):
     """
-    AMI의 주요 필드를 추출합니다:
-      - ImageId, Name, CreationDate, State, Public
+    AMI의 주요 필드 추출
     """
     rows = []
     for image in raw_data.get('Images', []):

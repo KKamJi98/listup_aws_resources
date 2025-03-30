@@ -2,8 +2,7 @@ import pandas as pd
 
 def get_raw_data(session, region):
     """
-    Glue Job 목록을 조회합니다.
-    get_jobs()를 호출하여 모든 Job 정보를 반환합니다.
+    Glue Job 목록 조회
     """
     client = session.client('glue', region_name=region)
     response = client.get_jobs()
@@ -12,12 +11,7 @@ def get_raw_data(session, region):
 
 def get_filtered_data(raw_data):
     """
-    추출 필드:
-      - JobName
-      - CreatedOn
-      - LastModifiedOn
-      - Role
-      - Command (예: command.Name)
+    원본 JSON에서 주요 필드만 추출해 DataFrame으로 반환
     """
     rows = []
     for job in raw_data.get("Jobs", []):

@@ -13,8 +13,7 @@ def get_raw_data(session, region):
 
 def get_filtered_data(raw_data):
     """
-    원본 JSON에서 SubnetId, VpcId, CidrBlock, AvailabilityZone, State, Tags 등
-    주요 필드만 추출해 DataFrame으로 반환
+    원본 JSON에서 주요 필드만 추출해 DataFrame으로 반환
     """
     rows = []
     for subnet in raw_data.get('Subnets', []):

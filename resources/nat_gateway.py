@@ -2,7 +2,7 @@ import pandas as pd
 
 def get_raw_data(session, region):
     """
-    NAT Gateway 정보를 조회합니다.
+    NAT Gateway의 전체 목록 조회
     """
     client = session.client('ec2', region_name=region)
     response = client.describe_nat_gateways()
@@ -10,8 +10,7 @@ def get_raw_data(session, region):
 
 def get_filtered_data(raw_data):
     """
-    NAT Gateway의 주요 필드를 추출합니다:
-      - NatGatewayId, State, VpcId, SubnetId, CreateTime
+    원본 JSON에서 주요 필드만 추출해 DataFrame으로 반환
     """
     rows = []
     for nat in raw_data.get('NatGateways', []):

@@ -3,7 +3,7 @@ import pandas as pd
 def get_raw_data(session, region):
     """
     EKS 클러스터 전체 목록 list_clusters() + describe_cluster()
-    보통 list_clusters()로 이름 목록 -> describe_cluster()로 세부 정보
+    {"Clusters": [cluster_detail, ...]} 형태로 반환
     """
     eks_client = session.client('eks', region_name=region)
     cluster_list = eks_client.list_clusters()
@@ -16,7 +16,7 @@ def get_raw_data(session, region):
 
 def get_filtered_data(raw_data):
     """
-    클러스터 이름, 상태, 엔드포인트, 버전, 생성일 등 추출
+    원본 JSON에서 주요 필드만 추출해 DataFrame으로 반환
     """
     rows = []
     for cluster in raw_data.get('Clusters', []):

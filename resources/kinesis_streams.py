@@ -2,9 +2,8 @@ import pandas as pd
 
 def get_raw_data(session, region):
     """
-    Kinesis Data Streams 목록을 조회하고, 각 스트림에 대해 describe_stream() 호출로 상세 정보를 수집합니다.
-    Pagination이 있을 수 있으므로 모든 스트림 이름을 모아서 조회합니다.
-    반환 구조: {"Streams": [stream_detail, ...]}
+    Kinesis Streams의 전체 목록을 조회
+    list_streams()로 Stream 목록을 조회하고, 각 Stream의 상세 정보를 describe_stream()로 조회하여 반환
     """
     client = session.client('kinesis', region_name=region)
     stream_names = []
@@ -23,12 +22,7 @@ def get_raw_data(session, region):
 
 def get_filtered_data(raw_data):
     """
-    추출 필드:
-      - StreamName
-      - StreamStatus
-      - RetentionPeriodHours
-      - OpenShardCount
-      - StreamARN
+    원본 JSON에서 주요 필드만 추출해 DataFrame으로 반환
     """
     rows = []
     for stream in raw_data.get("Streams", []):

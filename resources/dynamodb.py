@@ -2,10 +2,8 @@ import pandas as pd
 
 def get_raw_data(session, region):
     """
-    DynamoDB 테이블 목록과 각 테이블의 상세 정보를 조회합니다.
-    boto3 클라이언트를 사용해 list_tables()로 테이블 이름을 가져오고,
-    각 테이블에 대해 describe_table()을 호출하여 상세 정보를 수집합니다.
-    결과는 {"Tables": [table_detail, ...]} 형태로 반환됩니다.
+    DynamoDB 테이블 목록과 각 테이블의 상세 정보를 조회
+    {"Tables": [table_detail, ...]} 형태로 반환
     """
     client = session.client('dynamodb', region_name=region)
     
@@ -27,15 +25,7 @@ def get_raw_data(session, region):
 
 def get_filtered_data(raw_data):
     """
-    DynamoDB 테이블 상세 정보에서 주요 필드만 추출해 DataFrame으로 반환합니다.
-    추출 필드:
-      - TableName
-      - TableStatus
-      - CreationDateTime
-      - ItemCount
-      - TableSizeBytes
-      - ReadCapacityUnits (ProvisionedThroughput)
-      - WriteCapacityUnits (ProvisionedThroughput)
+    DynamoDB 테이블 상세 정보에서 주요 필드만 추출해 DataFrame으로 반환
     """
     rows = []
     for table in raw_data.get("Tables", []):
