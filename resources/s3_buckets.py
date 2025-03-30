@@ -17,7 +17,7 @@ def get_filtered_data(raw_data):
     for bucket in raw_data.get('Buckets', []):
         row = {
             'BucketName': bucket.get('Name'),
-            'CreationDate': str(bucket.get('CreationDate'))
+            'CreationDate': bucket.get('CreationDate').strftime("%Y-%m-%d") if bucket.get('CreationDate') else "N/A"
         }
         rows.append(row)
     return pd.DataFrame(rows)

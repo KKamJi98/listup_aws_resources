@@ -76,3 +76,8 @@ poetry run python listup_aws_resources.py
 
 JSON -> 원본
 Excel -> 가공된 데이터
+
+
+## TODO
+
+- [ ] 공통되게 사용되는 DateTime 포맷을 (%Y-%m-%d)로 수정하는 코드를 함수화

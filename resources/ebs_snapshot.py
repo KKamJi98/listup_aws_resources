@@ -13,16 +13,18 @@ def get_raw_data(session, region):
 def get_filtered_data(raw_data):
     """
     EBS 스냅샷의 주요 필드를 추출합니다:
+    각 날짜는 "YYYY-MM-DD" 형식으로 변환
     """
     rows = []
     for snap in raw_data.get('Snapshots', []):
-        name =  extract_name_tag(snap.get('Tags', []))
+        name = extract_name_tag(snap.get('Tags', []))
         if not name:
             name = "N/A"
         row = {
+            'Name': name,
             'SnapshotId': snap.get('SnapshotId'),
             'VolumeId': snap.get('VolumeId'),
-            'StartTime': str(snap.get('StartTime')),
+            'StartTime': snap.get('StartTime').strftime("%Y-%m-%d") if snap.get('StartTime') else "N/A",
             'State': snap.get('State'),
             'VolumeSize': snap.get('VolumeSize'),
             'Description': snap.get('Description')

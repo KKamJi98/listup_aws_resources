@@ -1,5 +1,3 @@
-# resources/subnets.py
-
 import pandas as pd
 from utils.name_tag import extract_name_tag
 

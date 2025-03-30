@@ -21,6 +21,7 @@ def get_raw_data(session, region):
 def get_filtered_data(raw_data):
     """
     원본 JSON에서 주요 필드만 추출해 DataFrame으로 반환
+    각 날짜는 "YYYY-MM-DD" 형식으로 변환
     """
     rows = []
     for acc in raw_data.get("Accelerators", []):
@@ -30,8 +31,8 @@ def get_filtered_data(raw_data):
             'Status': acc.get('Status'),
             'IpAddressType': acc.get('IpAddressType'),
             'Enabled': acc.get('Enabled'),
-            'CreatedTime': str(acc.get('CreatedTime')),
-            'LastModifiedTime': str(acc.get('LastModifiedTime'))
+            'CreatedTime': acc.get("CreatedTime").strftime("%Y-%m-%d") if acc.get("CreatedTime") else "N/A",
+            'LastModifiedTime': acc.get("LastModifiedTime").strftime("%Y-%m-%d") if acc.get("LastModifiedTime") else "N/A"
         }
         rows.append(row)
     return pd.DataFrame(rows)

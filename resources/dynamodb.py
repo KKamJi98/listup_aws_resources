@@ -26,13 +26,14 @@ def get_raw_data(session, region):
 def get_filtered_data(raw_data):
     """
     DynamoDB 테이블 상세 정보에서 주요 필드만 추출해 DataFrame으로 반환
+    각 날짜는 "YYYY-MM-DD" 형식으로 변환
     """
     rows = []
     for table in raw_data.get("Tables", []):
         row = {
             "TableName": table.get("TableName"),
             "TableStatus": table.get("TableStatus"),
-            "CreationDateTime": str(table.get("CreationDateTime")),
+            "CreationDateTime": table.get("CreationDateTime").strftime("%Y-%m-%d") if table.get("CreationDateTime") else "N/A",
             "ItemCount": table.get("ItemCount"),
             "TableSizeBytes": table.get("TableSizeBytes"),
         }

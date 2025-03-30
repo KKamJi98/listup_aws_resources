@@ -1,4 +1,5 @@
 import pandas as pd
+from datetime import datetime
 
 def get_raw_data(session, region):
     """
@@ -11,14 +12,15 @@ def get_raw_data(session, region):
 
 def get_filtered_data(raw_data):
     """
-    AMI의 주요 필드 추출
+    AMI의 주요 필드를 추출합니다.
+    각 날짜는 "YYYY-MM-DD" 형식으로 변환
     """
     rows = []
     for image in raw_data.get('Images', []):
         row = {
+            'Name': image.get('Name') if image.get('Name') else "N/A",
             'ImageId': image.get('ImageId'),
-            'Name': image.get('Name'),
-            'CreationDate': image.get('CreationDate'),
+            'CreationDate': datetime.strptime(image.get('CreationDate'), "%Y-%m-%dT%H:%M:%S.%fZ").strftime("%Y-%m-%d") if image.get('CreationDate') else "N/A",
             'State': image.get('State'),
             'Public': image.get('Public')
         }

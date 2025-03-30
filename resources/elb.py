@@ -28,6 +28,7 @@ def get_raw_data(session, region):
 def get_filtered_data(raw_data):
     """
     원본 JSON에서 주요 필드만 추출해 DataFrame으로 반환
+    각 날짜는 "YYYY-MM-DD" 형식으로 변환
     """
     rows = []
     # Classic ELB 처리
@@ -38,7 +39,7 @@ def get_filtered_data(raw_data):
             "DNSName": elb.get("DNSName"),
             "Scheme": elb.get("Scheme", "N/A"),
             "VpcId": elb.get("VPCId", "N/A"),
-            "CreatedTime": str(elb.get("CreatedTime")),
+            "CreatedDate": elb.get("CreatedTime").strftime("%Y-%m-%d") if elb.get("CreatedTime") else "N/A",
             "State": "N/A"  # Classic ELB에는 별도의 상태 정보가 없음
         }
         rows.append(row)
@@ -51,7 +52,7 @@ def get_filtered_data(raw_data):
             "DNSName": elb.get("DNSName"),
             "Scheme": elb.get("Scheme", "N/A"),
             "VpcId": elb.get("VpcId", "N/A"),
-            "CreatedTime": str(elb.get("CreatedTime")),
+            "CreatedDate": elb.get("CreatedTime").strftime("%Y-%m-%d") if elb.get("CreatedTime") else "N/A",
             "State": elb.get("State", {}).get("Code", "N/A")
         }
         rows.append(row)

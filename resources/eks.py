@@ -11,12 +11,12 @@ def get_raw_data(session, region):
     for name in cluster_list.get('clusters', []):
         detail = eks_client.describe_cluster(name=name)
         clusters.append(detail.get('cluster', {}))
-    # 반환 형태를 dict로 통일
     return {"Clusters": clusters}
 
 def get_filtered_data(raw_data):
     """
     원본 JSON에서 주요 필드만 추출해 DataFrame으로 반환
+    각 날짜는 "YYYY-MM-DD" 형식으로 변환
     """
     rows = []
     for cluster in raw_data.get('Clusters', []):
@@ -25,7 +25,7 @@ def get_filtered_data(raw_data):
             'Status': cluster.get('status'),
             'Endpoint': cluster.get('endpoint'),
             'Version': cluster.get('version'),
-            'CreatedAt': str(cluster.get('createdAt'))
+            'CreatedAt': cluster.get("createdAt").strftime("%Y-%m-%d") if cluster.get("createdAt") else "N/A"
         }
         rows.append(row)
     return pd.DataFrame(rows)

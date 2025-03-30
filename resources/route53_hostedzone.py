@@ -19,8 +19,8 @@ def get_filtered_data(raw_data):
         if name.endswith('.'):
             name = name[:-1]
         row = {
-            "Id": zone.get("Id"),
             "Name": name,
+            "Id": zone.get("Id"),
             "CallerReference": zone.get("CallerReference"),
             "ResourceRecordSetCount": zone.get("ResourceRecordSetCount"),
             "Config": zone.get("Config")

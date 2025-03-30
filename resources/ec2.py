@@ -7,7 +7,6 @@ def get_raw_data(session, region):
     """
     ec2_client = session.client('ec2', region_name=region)
     response = ec2_client.describe_instances()
-    # 보통 {'Reservations': [...]} 구조로 옴
     return response
 
 def get_filtered_data(raw_data):
@@ -28,9 +27,7 @@ def get_filtered_data(raw_data):
                 'State': inst.get('State', {}).get('Name'),
                 'PublicIp': inst.get('PublicIpAddress'),
                 'PrivateIp': inst.get('PrivateIpAddress'),
-                'LaunchTime': str(inst.get('LaunchTime'))  # 문자열 변환
+                'LaunchTime': inst.get('LaunchTime').strftime("%Y-%m-%d") if inst.get('LaunchTime') else "N/A"
             }
             rows.append(row)
-
-    df = pd.DataFrame(rows)
-    return df
+    return pd.DataFrame(rows)

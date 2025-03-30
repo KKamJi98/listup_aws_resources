@@ -11,19 +11,24 @@ def get_raw_data(session, region):
 
 def get_filtered_data(raw_data):
     '''
-    원본 JSON에서 주요 필드만 추출해 DataFrame으로 반환
+    원본 JSON에서 주요 필드와 생성 날짜(YYYY-MM-DD 형식)를 추출해 DataFrame으로 반환
     '''
     rows = []
     for ep in raw_data.get('VpcEndpoints', []):
         name = extract_name_tag(ep.get('Tags'))
         if not name:
             name = "N/A"
+
+        creation_timestamp = ep.get('CreationTimestamp')
+        formatted_date = creation_timestamp.strftime('%Y-%m-%d') if creation_timestamp else "N/A"
+
         row = {
             'Name': name,
             'VpcEndpointId': ep.get('VpcEndpointId'),
             'VpcId': ep.get('VpcId'),
             'ServiceName': ep.get('ServiceName'),
             'State': ep.get('State'),
+            'CreationDate': formatted_date,
             'RouteTableIds': ",".join(ep.get('RouteTableIds', [])) if ep.get('RouteTableIds') else None,
             'PolicyDocument': str(ep.get('PolicyDocument')) if ep.get('PolicyDocument') else None
         }
