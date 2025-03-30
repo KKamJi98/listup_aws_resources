@@ -32,7 +32,7 @@ def get_filtered_data(raw_data):
             "DeliveryStreamStatus": stream.get("DeliveryStreamStatus"),
             "DeliveryStreamType": stream.get("DeliveryStreamType"),
             "VersionId": stream.get("VersionId"),
-            "DeliveryStreamArn": stream.get("DeliveryStreamArn")
+            "DeliveryStreamArn": stream.get("DeliveryStreamARN")
         }
         rows.append(row)
     return pd.DataFrame(rows)
