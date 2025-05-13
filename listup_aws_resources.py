@@ -25,6 +25,8 @@ from resources.kinesis_firehose import get_raw_data as kinesis_firehose_raw, get
 from resources.glue_job import get_raw_data as glue_job_raw, get_filtered_data as glue_job_filtered
 from resources.route53_hostedzone import get_raw_data as route53_raw, get_filtered_data as route53_filtered
 from resources.secrets_manager import get_raw_data as secrets_raw, get_filtered_data as secrets_filtered
+from resources.eip import get_raw_data as eip_raw, get_filtered_data as eip_filtered
+from resources.internet_gateway import get_raw_data as internet_gateway_raw, get_filtered_data as internet_gateway_filtered
 
 
 class DateTimeEncoder(json.JSONEncoder):
@@ -201,6 +203,22 @@ def main():
         if not secrets_data_filtered.empty:
             sheet_name = f"Secrets_{region}"[:31]
             secrets_data_filtered.to_excel(writer, sheet_name=sheet_name, index=False)
+
+        # --- Elastic IP ---
+        eip_data_raw = eip_raw(session, region)
+        eip_data_filtered = eip_filtered(eip_data_raw)
+        region_raw_data['EIP'] = eip_data_raw
+        if not eip_data_filtered.empty:
+            sheet_name = f"EIP_{region}"[:31]
+            eip_data_filtered.to_excel(writer, sheet_name=sheet_name, index=False)
+
+        # --- Internet Gateway ---
+        internet_gateway_data_raw = internet_gateway_raw(session, region)
+        internet_gateway_data_filtered = internet_gateway_filtered(internet_gateway_data_raw)
+        region_raw_data['InternetGateway'] = internet_gateway_data_raw
+        if not internet_gateway_data_filtered.empty:
+            sheet_name = f"IGW_{region}"[:31]
+            internet_gateway_data_filtered.to_excel(writer, sheet_name=sheet_name, index=False)
 
         all_raw_data[region] = region_raw_data
 
