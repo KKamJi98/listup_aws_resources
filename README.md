@@ -6,7 +6,7 @@ AWS 리소스를 나열하고 정리하는 스크립트입니다. 특정 AWS 계
 
 ## 기능
 
-- 다양한 AWS 리소스(EKS, EC2, S3, RDS, DynamoDB, Route53, 등)를 손쉽게 조회할 수 있습니다.
+- 다양한 AWS 리소스(EKS, EC2, S3, RDS, DynamoDB, Route53, EIP, Internet Gateway 등)를 손쉽게 조회할 수 있습니다.
 - 조회된 결과는 Excel 및 JSON 형식으로 저장됩니다.
 
 ## 프로젝트 구조
@@ -19,12 +19,16 @@ listup_aws_resources/
 ├── resources/
 │   ├── amis.py
 │   ├── dynamodb.py
+│   ├── ebs.py
+│   ├── ebs_snapshot.py
 │   ├── ec2.py
+│   ├── eip.py
 │   ├── eks.py
 │   ├── elasticache.py
 │   ├── elb.py
 │   ├── glue_job.py
 │   ├── global_accelerator.py
+│   ├── internet_gateway.py
 │   ├── kinesis_firehose.py
 │   ├── kinesis_streams.py
 │   ├── nat_gateway.py
