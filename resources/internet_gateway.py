@@ -6,7 +6,24 @@ def get_raw_data(session, region):
     Internet Gateway의 전체 목록 조회
     """
     client = session.client('ec2', region_name=region)
-    response = client.describe_internet_gateways()
+import pandas as pd
+from utils.name_tag import extract_name_tag
+import botocore  # Import botocore for exception handling
+
+def get_raw_data(session, region):
+    """
+    Internet Gateway의 전체 목록 조회
+    """
+    client = session.client('ec2', region_name=region)
+    try:
+        response = client.describe_internet_gateways()
+        return response
+    except botocore.exceptions.ClientError as e:
+        print(f"An error occurred while describing internet gateways: {e}")
+        return None
+
+def get_filtered_data(raw_data):
+    """
     return response
 
 def get_filtered_data(raw_data):
