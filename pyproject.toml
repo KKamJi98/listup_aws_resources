@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "listup-aws-resources"
-version = "0.1.0"
-description = "listup aws resources"
+version = "1.0.0"
+description = "AWS 리소스를 나열하고 정리하는 스크립트"
 authors = ["KKamJi <xowl5460@naver.com>"]
 readme = "README.md"
 

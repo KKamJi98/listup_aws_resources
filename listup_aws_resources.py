@@ -27,6 +27,7 @@ from resources.route53_hostedzone import get_raw_data as route53_raw, get_filter
 from resources.secrets_manager import get_raw_data as secrets_raw, get_filtered_data as secrets_filtered
 from resources.eip import get_raw_data as eip_raw, get_filtered_data as eip_filtered
 from resources.internet_gateway import get_raw_data as internet_gateway_raw, get_filtered_data as internet_gateway_filtered
+from resources.security_groups import get_raw_data as security_groups_raw, get_filtered_data as security_groups_filtered
 
 
 class DateTimeEncoder(json.JSONEncoder):
@@ -219,6 +220,14 @@ def main():
         if not internet_gateway_data_filtered.empty:
             sheet_name = f"IGW_{region}"[:31]
             internet_gateway_data_filtered.to_excel(writer, sheet_name=sheet_name, index=False)
+
+        # --- Security Groups ---
+        security_groups_data_raw = security_groups_raw(session, region)
+        security_groups_data_filtered = security_groups_filtered(security_groups_data_raw)
+        region_raw_data['SecurityGroups'] = security_groups_data_raw
+        if not security_groups_data_filtered.empty:
+            sheet_name = f"SG_{region}"[:31]
+            security_groups_data_filtered.to_excel(writer, sheet_name=sheet_name, index=False)
 
         all_raw_data[region] = region_raw_data
 
