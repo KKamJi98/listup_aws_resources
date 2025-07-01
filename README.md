@@ -56,13 +56,21 @@ git clone https://github.com/KKamJi98/listup_aws_resources.git
 cd listup_aws_resources
 ```
 
-2. 의존성을 설치합니다.
+2. 가상 환경을 생성하고 활성화합니다.
 
 ```bash
-poetry install
+python3 -m venv .venv
+source .venv/bin/activate
 ```
 
-3. AWS 자격증명(credential)을 환경에 설정합니다.
+3. 의존성을 설치합니다.
+
+```bash
+pip install uv
+uv pip install -r requirements.txt
+```
+
+4. AWS 자격증명(credential)을 환경에 설정합니다.
 
 ```bash
 export AWS_ACCESS_KEY_ID=<your_access_key>
@@ -70,10 +78,10 @@ export AWS_SECRET_ACCESS_KEY=<your_secret_key>
 export AWS_DEFAULT_REGION=<your_region>
 ```
 
-4. 프로그램을 실행합니다.
+5. 프로그램을 실행합니다.
 
 ```bash
-poetry run python listup_aws_resources.py
+python listup_aws_resources.py
 ```
 
 ## 결과물

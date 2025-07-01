@@ -177,3 +177,5 @@ cython_debug/
 # others
 
 data/*
+
+.prompt.md

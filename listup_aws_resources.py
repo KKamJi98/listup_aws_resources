@@ -28,6 +28,9 @@ from resources.secrets_manager import get_raw_data as secrets_raw, get_filtered_
 from resources.eip import get_raw_data as eip_raw, get_filtered_data as eip_filtered
 from resources.internet_gateway import get_raw_data as internet_gateway_raw, get_filtered_data as internet_gateway_filtered
 from resources.security_groups import get_raw_data as security_groups_raw, get_filtered_data as security_groups_filtered
+from resources.ecr import get_raw_data as ecr_raw, get_filtered_data as ecr_filtered
+from resources.security_group_rules import get_raw_data as security_group_rules_raw, get_filtered_data as security_group_rules_filtered
+from resources.auto_scaling_groups import get_raw_data as auto_scaling_groups_raw, get_filtered_data as auto_scaling_groups_filtered
 
 
 class DateTimeEncoder(json.JSONEncoder):
@@ -228,6 +231,30 @@ def main():
         if not security_groups_data_filtered.empty:
             sheet_name = f"SG_{region}"[:31]
             security_groups_data_filtered.to_excel(writer, sheet_name=sheet_name, index=False)
+
+        # --- ECR ---
+        ecr_data_raw = ecr_raw(session, region)
+        ecr_data_filtered = ecr_filtered(ecr_data_raw)
+        region_raw_data['ECR'] = ecr_data_raw
+        if not ecr_data_filtered.empty:
+            sheet_name = f"ECR_{region}"[:31]
+            ecr_data_filtered.to_excel(writer, sheet_name=sheet_name, index=False)
+
+        # --- Security Group Rules ---
+        security_group_rules_data_raw = security_group_rules_raw(session, region)
+        security_group_rules_data_filtered = security_group_rules_filtered(security_group_rules_data_raw)
+        region_raw_data['SecurityGroupRules'] = security_group_rules_data_raw
+        if not security_group_rules_data_filtered.empty:
+            sheet_name = f"SGRules_{region}"[:31]
+            security_group_rules_data_filtered.to_excel(writer, sheet_name=sheet_name, index=False)
+
+        # --- Auto Scaling Groups ---
+        auto_scaling_groups_data_raw = auto_scaling_groups_raw(session, region)
+        auto_scaling_groups_data_filtered = auto_scaling_groups_filtered(auto_scaling_groups_data_raw)
+        region_raw_data['AutoScalingGroups'] = auto_scaling_groups_data_raw
+        if not auto_scaling_groups_data_filtered.empty:
+            sheet_name = f"ASG_{region}"[:31]
+            auto_scaling_groups_data_filtered.to_excel(writer, sheet_name=sheet_name, index=False)
 
         all_raw_data[region] = region_raw_data
 
