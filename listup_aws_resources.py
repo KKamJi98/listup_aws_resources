@@ -8,10 +8,10 @@ import pandas as pd
 
 from resources.amis import get_filtered_data as amis_filtered
 from resources.amis import get_raw_data as amis_raw
-from resources.auto_scaling_groups import (
-    get_filtered_data as auto_scaling_groups_filtered,
-)
-from resources.auto_scaling_groups import get_raw_data as auto_scaling_groups_raw
+from resources.auto_scaling_groups import \
+    get_filtered_data as auto_scaling_groups_filtered
+from resources.auto_scaling_groups import \
+    get_raw_data as auto_scaling_groups_raw
 from resources.dynamodb import get_filtered_data as dynamodb_filtered
 from resources.dynamodb import get_raw_data as dynamodb_raw
 from resources.ebs import get_filtered_data as ebs_filtered
@@ -34,11 +34,14 @@ from resources.global_accelerator import get_filtered_data as ga_filtered
 from resources.global_accelerator import get_raw_data as ga_raw
 from resources.glue_job import get_filtered_data as glue_job_filtered
 from resources.glue_job import get_raw_data as glue_job_raw
-from resources.internet_gateway import get_filtered_data as internet_gateway_filtered
+from resources.internet_gateway import \
+    get_filtered_data as internet_gateway_filtered
 from resources.internet_gateway import get_raw_data as internet_gateway_raw
-from resources.kinesis_firehose import get_filtered_data as kinesis_firehose_filtered
+from resources.kinesis_firehose import \
+    get_filtered_data as kinesis_firehose_filtered
 from resources.kinesis_firehose import get_raw_data as kinesis_firehose_raw
-from resources.kinesis_streams import get_filtered_data as kinesis_streams_filtered
+from resources.kinesis_streams import \
+    get_filtered_data as kinesis_streams_filtered
 from resources.kinesis_streams import get_raw_data as kinesis_streams_raw
 from resources.nat_gateway import get_filtered_data as nat_gateway_filtered
 from resources.nat_gateway import get_raw_data as nat_gateway_raw
@@ -50,11 +53,12 @@ from resources.s3_buckets import get_filtered_data as s3_filtered
 from resources.s3_buckets import get_raw_data as s3_raw
 from resources.secrets_manager import get_filtered_data as secrets_filtered
 from resources.secrets_manager import get_raw_data as secrets_raw
-from resources.security_group_rules import (
-    get_filtered_data as security_group_rules_filtered,
-)
-from resources.security_group_rules import get_raw_data as security_group_rules_raw
-from resources.security_groups import get_filtered_data as security_groups_filtered
+from resources.security_group_rules import \
+    get_filtered_data as security_group_rules_filtered
+from resources.security_group_rules import \
+    get_raw_data as security_group_rules_raw
+from resources.security_groups import \
+    get_filtered_data as security_groups_filtered
 from resources.security_groups import get_raw_data as security_groups_raw
 from resources.subnets import get_filtered_data as subnets_filtered
 from resources.subnets import get_raw_data as subnets_raw
