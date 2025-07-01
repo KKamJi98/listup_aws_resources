@@ -1,5 +1,6 @@
 import pandas as pd
 
+
 def get_raw_data(session, region):
     """
     Classic ELB와 ELBv2 (ALB, NLB) 정보를 모두 조회하여 반환
@@ -14,16 +15,17 @@ def get_raw_data(session, region):
     raw_data = {"Classic": [], "v2": []}
 
     # Classic ELB
-    elb_client = session.client('elb', region_name=region)
+    elb_client = session.client("elb", region_name=region)
     classic_response = elb_client.describe_load_balancers()
     raw_data["Classic"] = classic_response.get("LoadBalancerDescriptions", [])
 
     # ELBv2 (ALB, NLB)
-    elbv2_client = session.client('elbv2', region_name=region)
+    elbv2_client = session.client("elbv2", region_name=region)
     v2_response = elbv2_client.describe_load_balancers()
     raw_data["v2"] = v2_response.get("LoadBalancers", [])
 
     return raw_data
+
 
 def get_filtered_data(raw_data):
     """
@@ -39,11 +41,15 @@ def get_filtered_data(raw_data):
             "DNSName": elb.get("DNSName"),
             "Scheme": elb.get("Scheme", "N/A"),
             "VpcId": elb.get("VPCId", "N/A"),
-            "CreatedDate": elb.get("CreatedTime").strftime("%Y-%m-%d") if elb.get("CreatedTime") else "N/A",
-            "State": "N/A"  # Classic ELB에는 별도의 상태 정보가 없음
+            "CreatedDate": (
+                elb.get("CreatedTime").strftime("%Y-%m-%d")
+                if elb.get("CreatedTime")
+                else "N/A"
+            ),
+            "State": "N/A",  # Classic ELB에는 별도의 상태 정보가 없음
         }
         rows.append(row)
-    
+
     # ELBv2 처리 (ALB, NLB)
     for elb in raw_data.get("v2", []):
         row = {
@@ -52,9 +58,13 @@ def get_filtered_data(raw_data):
             "DNSName": elb.get("DNSName"),
             "Scheme": elb.get("Scheme", "N/A"),
             "VpcId": elb.get("VpcId", "N/A"),
-            "CreatedDate": elb.get("CreatedTime").strftime("%Y-%m-%d") if elb.get("CreatedTime") else "N/A",
-            "State": elb.get("State", {}).get("Code", "N/A")
+            "CreatedDate": (
+                elb.get("CreatedTime").strftime("%Y-%m-%d")
+                if elb.get("CreatedTime")
+                else "N/A"
+            ),
+            "State": elb.get("State", {}).get("Code", "N/A"),
         }
         rows.append(row)
-    
+
     return pd.DataFrame(rows)

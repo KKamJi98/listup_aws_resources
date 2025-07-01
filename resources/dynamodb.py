@@ -1,27 +1,31 @@
 import pandas as pd
 
+
 def get_raw_data(session, region):
     """
     DynamoDB 테이블 목록과 각 테이블의 상세 정보를 조회
     {"Tables": [table_detail, ...]} 형태로 반환
     """
-    client = session.client('dynamodb', region_name=region)
-    
+    client = session.client("dynamodb", region_name=region)
+
     # 모든 테이블 이름 조회 (pagination 처리)
     table_names = []
     response = client.list_tables()
     table_names.extend(response.get("TableNames", []))
     while "LastEvaluatedTableName" in response:
-        response = client.list_tables(ExclusiveStartTableName=response["LastEvaluatedTableName"])
+        response = client.list_tables(
+            ExclusiveStartTableName=response["LastEvaluatedTableName"]
+        )
         table_names.extend(response.get("TableNames", []))
-    
+
     tables = []
     for table_name in table_names:
         detail_response = client.describe_table(TableName=table_name)
         table_detail = detail_response.get("Table", {})
         tables.append(table_detail)
-    
+
     return {"Tables": tables}
+
 
 def get_filtered_data(raw_data):
     """
@@ -33,7 +37,11 @@ def get_filtered_data(raw_data):
         row = {
             "TableName": table.get("TableName"),
             "TableStatus": table.get("TableStatus"),
-            "CreationDateTime": table.get("CreationDateTime").strftime("%Y-%m-%d") if table.get("CreationDateTime") else "N/A",
+            "CreationDateTime": (
+                table.get("CreationDateTime").strftime("%Y-%m-%d")
+                if table.get("CreationDateTime")
+                else "N/A"
+            ),
             "ItemCount": table.get("ItemCount"),
             "TableSizeBytes": table.get("TableSizeBytes"),
         }

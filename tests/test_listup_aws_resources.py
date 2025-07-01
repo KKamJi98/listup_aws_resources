@@ -1,6 +1,7 @@
-
 import pytest
+
 from listup_aws_resources import main
+
 
 # This is a placeholder test. In a real-world scenario, you would mock boto3 and other external dependencies.
 def test_main():

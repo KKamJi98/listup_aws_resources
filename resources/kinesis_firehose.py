@@ -1,11 +1,12 @@
 import pandas as pd
 
+
 def get_raw_data(session, region):
     """
     Kinesis Firehose의 전체 목록을 조회
     list_delivery_streams()로 Delivery Stream 목록을 조회하고, 각 Delivery Stream의 상세 정보를 describe_delivery_stream()로 조회하여 반환
     """
-    client = session.client('firehose', region_name=region)
+    client = session.client("firehose", region_name=region)
     stream_names = []
     response = client.list_delivery_streams()
     stream_names.extend(response.get("DeliveryStreamNames", []))
@@ -14,12 +15,13 @@ def get_raw_data(session, region):
             ExclusiveStartDeliveryStreamName=stream_names[-1]
         )
         stream_names.extend(response.get("DeliveryStreamNames", []))
-        
+
     streams = []
     for name in stream_names:
         detail_response = client.describe_delivery_stream(DeliveryStreamName=name)
         streams.append(detail_response.get("DeliveryStreamDescription", {}))
     return {"DeliveryStreams": streams}
+
 
 def get_filtered_data(raw_data):
     """
@@ -32,7 +34,7 @@ def get_filtered_data(raw_data):
             "DeliveryStreamStatus": stream.get("DeliveryStreamStatus"),
             "DeliveryStreamType": stream.get("DeliveryStreamType"),
             "VersionId": stream.get("VersionId"),
-            "DeliveryStreamArn": stream.get("DeliveryStreamARN")
+            "DeliveryStreamArn": stream.get("DeliveryStreamARN"),
         }
         rows.append(row)
     return pd.DataFrame(rows)
