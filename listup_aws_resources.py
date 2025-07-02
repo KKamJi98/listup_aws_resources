@@ -85,7 +85,12 @@ def main():
         default=["ap-northeast-2"],
         help="조회할 AWS 리전명 (여러 개 가능). 예: --region ap-northeast-2 us-west-2",
     )
-    args = parser.parse_args()
+    # Check if running in a test environment
+    import sys
+    if 'pytest' in sys.modules:
+        args = parser.parse_args([]) # Pass empty list to avoid parsing test arguments
+    else:
+        args = parser.parse_args()
     regions = args.regions
 
     timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
