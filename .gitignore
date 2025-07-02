@@ -174,8 +174,5 @@ cython_debug/
 .pypirc
 
 
-# others
+GEMINI.md
 
-data/*
-
-.prompt.md
