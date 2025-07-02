@@ -56,17 +56,16 @@ git clone https://github.com/KKamJi98/listup_aws_resources.git
 cd listup_aws_resources
 ```
 
-2. 가상 환경을 생성하고 활성화합니다.
+2. `uv` 가상 환경을 생성하고 활성화합니다.
 
 ```bash
-python3 -m venv .venv
+uv venv
 source .venv/bin/activate
 ```
 
 3. 의존성을 설치합니다.
 
 ```bash
-pip install uv
 uv pip install -r requirements.txt
 ```
 
@@ -95,3 +94,12 @@ Excel -> 가공된 데이터
 ## TODO
 
 - [ ] 공통되게 사용되는 DateTime 포맷을 (%Y-%m-%d)로 수정하는 코드를 함수화
+
+
+## 기여
+
+이슈를 생성하거나 PR을 보내 기여할 수 있습니다.
+
+## 라이선스
+
+이 프로젝트는 MIT 라이선스를 따릅니다.

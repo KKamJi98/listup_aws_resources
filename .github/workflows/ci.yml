@@ -1,43 +1,46 @@
-
-name: CI
+name: CI/CD
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
   pull_request:
-    branches: [ main ]
+
+permissions:
+  contents: write # 태그·릴리스 생성
+  pull-requests: write # release-please-action이 PR을 생성하기 위해 필요
+  issues: write # 레이블 생성 권한 추가
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Install uv
+        run: pip install uv
+      - name: Install dependencies
+        run: |
+          uv venv .venv
+          uv pip install -e .[dev]
+          echo "$GITHUB_WORKSPACE/.venv/bin" >> "$GITHUB_PATH"
+      - name: Run tests
+        run: |
+          source .venv/bin/activate
+          pytest -q
+      - name: Lint
+        run: |
+          .venv/bin/black --check .
+          .venv/bin/isort --check .
 
-    - name: Set up Python
-      uses: actions/setup-python@v3
-      with:
-        python-version: '3.11'
-
-    - name: Install dependencies
-      run: |
-        pip install uv
-        uv venv
-        source .venv/bin/activate
-        uv pip install -r requirements.txt
-        uv pip install pytest black isort
-
-    - name: Run isort
-      run: |
-        source .venv/bin/activate
-        isort --check --diff .
-
-    - name: Run black
-      run: |
-        source .venv/bin/activate
-        black --check .
-
-    - name: Run pytest
-      run: |
-        source .venv/bin/activate
-        pytest
+  release-please:
+    needs: test
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: googleapis/release-please-action@v4
+        id: release
+        with:
+          release-type: python
