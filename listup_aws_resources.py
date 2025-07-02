@@ -87,8 +87,9 @@ def main():
     )
     # Check if running in a test environment
     import sys
-    if 'pytest' in sys.modules:
-        args = parser.parse_args([]) # Pass empty list to avoid parsing test arguments
+
+    if "pytest" in sys.modules:
+        args = parser.parse_args([])  # Pass empty list to avoid parsing test arguments
     else:
         args = parser.parse_args()
     regions = args.regions
