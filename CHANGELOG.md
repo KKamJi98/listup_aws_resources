@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/KKamJi98/listup_aws_resources/compare/v1.1.0...v1.1.1) (2025-07-14)
+
+
+### Documentation
+
+* update README and streamline package management ([08c64b6](https://github.com/KKamJi98/listup_aws_resources/commit/08c64b6d3676f5f2178a908dd658a2e9d5d51abb))
+
 ## [1.1.0](https://github.com/KKamJi98/listup_aws_resources/compare/v1.0.0...v1.1.0) (2025-07-02)
 
 
