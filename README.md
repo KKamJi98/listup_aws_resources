@@ -43,7 +43,7 @@ listup_aws_resources/
 │   └── vpc_endpoint.py
 ├── listup_aws_resources.py
 ├── pyproject.toml
-├── poetry.lock
+├── uv.lock
 └── README.md
 ```
 
@@ -66,7 +66,7 @@ source .venv/bin/activate
 3. 의존성을 설치합니다.
 
 ```bash
-uv pip install -r requirements.txt
+uv sync
 ```
 
 4. AWS 자격증명(credential)을 환경에 설정합니다.
@@ -93,7 +93,7 @@ Excel -> 가공된 데이터
 
 ## TODO
 
-- [ ] 공통되게 사용되는 DateTime 포맷을 (%Y-%m-%d)로 수정하는 코드를 함수화
+- [ ] 공통되게 사용되는 DateTime 포���을 (%Y-%m-%d)로 수정하는 코드를 함수화
 
 
 ## 기여
@@ -103,3 +103,12 @@ Excel -> 가공된 데이터
 ## 라이선스
 
 이 프로젝트는 MIT 라이선스를 따릅니다.
+
+## 버전
+
+현재 버전은 1.1.0입니다.
+
+## 작성자
+
+- 이메일: rlaxowl5460@gmail.com
+- GitHub: [KKamJi98](https://github.com/KKamJi98)
