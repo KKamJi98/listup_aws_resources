@@ -9,6 +9,7 @@ AWS 리소스를 나열하고 정리하는 스크립트입니다. 특정 AWS 계
 - 다양한 AWS 리소스(EKS, EC2, S3, RDS, DynamoDB, Route53, EIP, Internet Gateway, Security Group 등)를 손쉽게 조회할 수 있습니다.
 - 조회된 결과는 Excel 및 JSON 형식으로 저장됩니다.
 - Security Group 리소스에서 0.0.0.0/0 AnyOpen된 Inbound Rule을 가진 항목은 '⚠️ YES'로 표시됩니다.
+- SES Identity 리소스에서 이메일 자격 증명의 확인 상태, DKIM 상태, 알림 설정 등을 확인할 수 있습니다.
 
 ## 프로젝트 구조
 
