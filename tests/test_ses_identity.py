@@ -2,7 +2,6 @@
 Tests for SES identity module.
 """
 
-from datetime import datetime, timezone
 from unittest.mock import MagicMock
 
 import pandas as pd
@@ -28,8 +27,7 @@ def test_get_raw_data_empty():
     assert result == {
         "Identities": [],
         "VerificationAttributes": {},
-        "DkimAttributes": {},
-        "NotificationAttributes": {},
+        "Tags": {},
     }
     mock_session.client.assert_called_once_with("ses", region_name="us-east-1")
 
@@ -39,46 +37,36 @@ def test_get_raw_data_with_identities():
     # Mock session and client
     mock_session = MagicMock()
     mock_client = MagicMock()
-    mock_session.client.return_value = mock_client
+    mock_sts_client = MagicMock()
+
+    # Setup mock clients
+    mock_session.client.side_effect = lambda service, **kwargs: {
+        "ses": mock_client,
+        "sts": mock_sts_client,
+    }[service]
+
+    mock_sts_client.get_caller_identity.return_value = {"Account": "123456789012"}
 
     # Mock responses
     mock_client.list_identities.return_value = {
-        "Identities": ["test@example.com", "info@example.com"]
+        "Identities": ["test@example.com", "example.com"]
     }
     mock_client.get_identity_verification_attributes.return_value = {
         "VerificationAttributes": {
             "test@example.com": {
                 "VerificationStatus": "Success",
-                "VerificationStartDate": datetime(2023, 1, 15, tzinfo=timezone.utc),
             },
-            "info@example.com": {
+            "example.com": {
                 "VerificationStatus": "Pending",
-                "VerificationStartDate": datetime(2023, 2, 20, tzinfo=timezone.utc),
             },
         }
     }
-    mock_client.get_identity_dkim_attributes.return_value = {
-        "DkimAttributes": {
-            "test@example.com": {
-                "DkimEnabled": True,
-                "DkimVerificationStatus": "Success",
-            },
-            "info@example.com": {
-                "DkimEnabled": False,
-                "DkimVerificationStatus": "NotStarted",
-            },
-        }
-    }
-    mock_client.get_identity_notification_attributes.return_value = {
-        "NotificationAttributes": {
-            "test@example.com": {
-                "BounceTopic": "arn:aws:sns:us-east-1:123456789012:bounce-topic",
-                "ComplaintTopic": "arn:aws:sns:us-east-1:123456789012:complaint-topic",
-                "DeliveryTopic": "arn:aws:sns:us-east-1:123456789012:delivery-topic",
-            },
-            "info@example.com": {},
-        }
-    }
+
+    # Mock tag responses
+    mock_client.list_tags_for_resource.side_effect = [
+        {"Tags": [{"Key": "Environment", "Value": "Production"}]},
+        {"Tags": [{"Key": "Project", "Value": "Website"}]},
+    ]
 
     # Call function
     result = get_raw_data(mock_session, "us-east-1")
@@ -87,7 +75,7 @@ def test_get_raw_data_with_identities():
     assert "Identities" in result
     assert len(result["Identities"]) == 2
     assert "test@example.com" in result["Identities"]
-    assert "info@example.com" in result["Identities"]
+    assert "example.com" in result["Identities"]
 
     assert "VerificationAttributes" in result
     assert "test@example.com" in result["VerificationAttributes"]
@@ -96,13 +84,11 @@ def test_get_raw_data_with_identities():
         == "Success"
     )
 
-    assert "DkimAttributes" in result
-    assert "test@example.com" in result["DkimAttributes"]
-    assert result["DkimAttributes"]["test@example.com"]["DkimEnabled"] is True
-
-    assert "NotificationAttributes" in result
-    assert "test@example.com" in result["NotificationAttributes"]
-    assert "BounceTopic" in result["NotificationAttributes"]["test@example.com"]
+    assert "Tags" in result
+    assert "test@example.com" in result["Tags"]
+    assert len(result["Tags"]["test@example.com"]) == 1
+    assert result["Tags"]["test@example.com"][0]["Key"] == "Environment"
+    assert result["Tags"]["test@example.com"][0]["Value"] == "Production"
 
 
 def test_get_filtered_data_empty():
@@ -110,8 +96,7 @@ def test_get_filtered_data_empty():
     raw_data = {
         "Identities": [],
         "VerificationAttributes": {},
-        "DkimAttributes": {},
-        "NotificationAttributes": {},
+        "Tags": {},
     }
 
     result = get_filtered_data(raw_data)
@@ -123,34 +108,21 @@ def test_get_filtered_data_empty():
 def test_get_filtered_data_with_identities():
     """Test get_filtered_data with identities."""
     raw_data = {
-        "Identities": ["test@example.com", "info@example.com"],
+        "Identities": ["test@example.com", "example.com"],
         "VerificationAttributes": {
             "test@example.com": {
                 "VerificationStatus": "Success",
-                "VerificationStartDate": datetime(2023, 1, 15, tzinfo=timezone.utc),
             },
-            "info@example.com": {
+            "example.com": {
                 "VerificationStatus": "Pending",
-                "VerificationStartDate": datetime(2023, 2, 20, tzinfo=timezone.utc),
             },
         },
-        "DkimAttributes": {
-            "test@example.com": {
-                "DkimEnabled": True,
-                "DkimVerificationStatus": "Success",
-            },
-            "info@example.com": {
-                "DkimEnabled": False,
-                "DkimVerificationStatus": "NotStarted",
-            },
-        },
-        "NotificationAttributes": {
-            "test@example.com": {
-                "BounceTopic": "arn:aws:sns:us-east-1:123456789012:bounce-topic",
-                "ComplaintTopic": "arn:aws:sns:us-east-1:123456789012:complaint-topic",
-                "DeliveryTopic": "arn:aws:sns:us-east-1:123456789012:delivery-topic",
-            },
-            "info@example.com": {},
+        "Tags": {
+            "test@example.com": [{"Key": "Environment", "Value": "Production"}],
+            "example.com": [
+                {"Key": "Project", "Value": "Website"},
+                {"Key": "Owner", "Value": "Marketing"},
+            ],
         },
     }
 
@@ -161,19 +133,12 @@ def test_get_filtered_data_with_identities():
 
     # Check first row
     assert result.iloc[0]["Identity"] == "test@example.com"
-    assert result.iloc[0]["VerificationStatus"] == "Success"
-    assert result.iloc[0]["DkimEnabled"] == "Yes"
-    assert result.iloc[0]["DkimVerificationStatus"] == "Success"
-    assert (
-        result.iloc[0]["BounceNotifications"]
-        == "arn:aws:sns:us-east-1:123456789012:bounce-topic"
-    )
-    assert result.iloc[0]["CreatedDate"] == "2023-01-15"
+    assert result.iloc[0]["IdentityType"] == "Email"
+    assert result.iloc[0]["IdentityStatus"] == "Success"
+    assert result.iloc[0]["Tags"] == "Environment:Production"
 
     # Check second row
-    assert result.iloc[1]["Identity"] == "info@example.com"
-    assert result.iloc[1]["VerificationStatus"] == "Pending"
-    assert result.iloc[1]["DkimEnabled"] == "No"
-    assert result.iloc[1]["DkimVerificationStatus"] == "NotStarted"
-    assert result.iloc[1]["BounceNotifications"] == "Not configured"
-    assert result.iloc[1]["CreatedDate"] == "2023-02-20"
+    assert result.iloc[1]["Identity"] == "example.com"
+    assert result.iloc[1]["IdentityType"] == "Domain"
+    assert result.iloc[1]["IdentityStatus"] == "Pending"
+    assert result.iloc[1]["Tags"] == "Project:Website, Owner:Marketing"
