@@ -56,6 +56,8 @@ from resources.security_group_rules import (
 from resources.security_group_rules import get_raw_data as security_group_rules_raw
 from resources.security_groups import get_filtered_data as security_groups_filtered
 from resources.security_groups import get_raw_data as security_groups_raw
+from resources.ses_identity import get_filtered_data as ses_identity_filtered
+from resources.ses_identity import get_raw_data as ses_identity_raw
 from resources.subnets import get_filtered_data as subnets_filtered
 from resources.subnets import get_raw_data as subnets_raw
 from resources.vpc import get_filtered_data as vpc_filtered
@@ -323,6 +325,17 @@ def main():
         if not auto_scaling_groups_data_filtered.empty:
             sheet_name = f"ASG_{region}"[:31]
             auto_scaling_groups_data_filtered.to_excel(
+                writer, sheet_name=sheet_name, index=False
+            )
+            
+        # --- SES Identity (Email) ---
+        print(f"\n=== Collecting SES Identities in region: {region} ===")
+        ses_identity_data_raw = ses_identity_raw(session, region)
+        ses_identity_data_filtered = ses_identity_filtered(ses_identity_data_raw)
+        region_raw_data["SESIdentity"] = ses_identity_data_raw
+        if not ses_identity_data_filtered.empty:
+            sheet_name = f"SESIdentity_{region}"[:31]
+            ses_identity_data_filtered.to_excel(
                 writer, sheet_name=sheet_name, index=False
             )
 
