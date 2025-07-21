@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.2.0](https://github.com/KKamJi98/listup_aws_resources/compare/v1.1.0...v1.2.0) (2025-07-21)
+
+
+### Features
+
+* **main:** Add SES identity resource collection to main script ([39e1b6f](https://github.com/KKamJi98/listup_aws_resources/commit/39e1b6f9b2d29b32db5a5f361039bb728c92b3f9))
+* **ses:** improve SES identity module with datetime formatting and add tests ([a5bd9f4](https://github.com/KKamJi98/listup_aws_resources/commit/a5bd9f456fb4bd8a265b53832cad3d7ad3850ed0))
+* **utils:** add datetime formatting utility function ([372f503](https://github.com/KKamJi98/listup_aws_resources/commit/372f5032424994da9854ec903c9433fcd4e9efaf))
+
+
+### Documentation
+
+* update README and streamline package management ([08c64b6](https://github.com/KKamJi98/listup_aws_resources/commit/08c64b6d3676f5f2178a908dd658a2e9d5d51abb))
+
 ## [Unreleased]
 
 ### Features
