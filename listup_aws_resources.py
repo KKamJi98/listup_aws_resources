@@ -327,7 +327,7 @@ def main():
             auto_scaling_groups_data_filtered.to_excel(
                 writer, sheet_name=sheet_name, index=False
             )
-            
+
         # --- SES Identity (Email) ---
         print(f"\n=== Collecting SES Identities in region: {region} ===")
         ses_identity_data_raw = ses_identity_raw(session, region)
