@@ -58,6 +58,11 @@ def get_filtered_data(raw_data: dict[str, Any]) -> pd.DataFrame:
             if not name:
                 name = "N/A"
 
+            # Security Groups 정보 추출
+            security_groups = inst.get("SecurityGroups", [])
+            sg_ids = [sg.get("GroupId", "") for sg in security_groups]
+            sg_names = [sg.get("GroupName", "") for sg in security_groups]
+
             row = {
                 "Name": name,
                 "InstanceId": inst.get("InstanceId", ""),
@@ -65,6 +70,8 @@ def get_filtered_data(raw_data: dict[str, Any]) -> pd.DataFrame:
                 "State": inst.get("State", {}).get("Name", ""),
                 "PublicIp": inst.get("PublicIpAddress", ""),
                 "PrivateIp": inst.get("PrivateIpAddress", ""),
+                "SecurityGroupIds": ", ".join(sg_ids),
+                "SecurityGroupNames": ", ".join(sg_names),
                 "LaunchTime": format_datetime(inst.get("LaunchTime")),
             }
             rows.append(row)
