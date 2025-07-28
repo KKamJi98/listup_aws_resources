@@ -145,8 +145,8 @@ def get_filtered_data(raw_data):
             "VpcId": sg.get("VpcId", ""),
             "Description": sg.get("Description", ""),
             "AnyOpenInbound": "⚠️ YES" if sg.get("HasAnyOpenInbound", False) else "No",
-            "InboundRules": "\n".join(inbound_rules) if inbound_rules else "-",
-            "OutboundRules": "\n".join(outbound_rules) if outbound_rules else "-",
+            "InboundRules": inbound_rules if inbound_rules else [],
+            "OutboundRules": outbound_rules if outbound_rules else [],
             "Tags": ", ".join(
                 [
                     f"{tag.get('Key', '')}={tag.get('Value', '')}"

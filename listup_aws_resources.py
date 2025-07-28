@@ -104,6 +104,7 @@ def main():
         os.makedirs(data_dir)
 
     all_raw_data = {}
+    all_filtered_data = {}  # 필터링된 데이터를 저장할 딕셔너리
     excel_path = os.path.join(data_dir, f"aws_resources_{timestamp}.xlsx")
     writer = pd.ExcelWriter(excel_path, engine="openpyxl")
 
@@ -111,12 +112,14 @@ def main():
         print(f"\n=== Collecting resources in region: {region} ===")
         session = boto3.Session(region_name=region)
         region_raw_data = {}
+        region_filtered_data = {}
 
         # --- EC2 ---
         ec2_data_raw = ec2_raw(session, region)
         ec2_data_filtered = ec2_filtered(ec2_data_raw)
         region_raw_data["EC2"] = ec2_data_raw
         if not ec2_data_filtered.empty:
+            region_filtered_data["EC2"] = ec2_data_filtered.to_dict("records")
             sheet_name = f"EC2_{region}"[:31]
             ec2_data_filtered.to_excel(writer, sheet_name=sheet_name, index=False)
 
@@ -125,6 +128,7 @@ def main():
         vpc_data_filtered = vpc_filtered(vpc_data_raw)
         region_raw_data["VPC"] = vpc_data_raw
         if not vpc_data_filtered.empty:
+            region_filtered_data["VPC"] = vpc_data_filtered.to_dict("records")
             sheet_name = f"VPC_{region}"[:31]
             vpc_data_filtered.to_excel(writer, sheet_name=sheet_name, index=False)
 
@@ -133,6 +137,7 @@ def main():
         rds_data_filtered = rds_filtered(rds_data_raw)
         region_raw_data["RDS"] = rds_data_raw
         if not rds_data_filtered.empty:
+            region_filtered_data["RDS"] = rds_data_filtered.to_dict("records")
             sheet_name = f"RDS_{region}"[:31]
             rds_data_filtered.to_excel(writer, sheet_name=sheet_name, index=False)
 
@@ -141,6 +146,7 @@ def main():
         eks_data_filtered = eks_filtered(eks_data_raw)
         region_raw_data["EKS"] = eks_data_raw
         if not eks_data_filtered.empty:
+            region_filtered_data["EKS"] = eks_data_filtered.to_dict("records")
             sheet_name = f"EKS_{region}"[:31]
             eks_data_filtered.to_excel(writer, sheet_name=sheet_name, index=False)
 
@@ -149,6 +155,7 @@ def main():
         subnets_data_filtered = subnets_filtered(subnets_data_raw)
         region_raw_data["Subnets"] = subnets_data_raw
         if not subnets_data_filtered.empty:
+            region_filtered_data["Subnets"] = subnets_data_filtered.to_dict("records")
             sheet_name = f"Subnets_{region}"[:31]
             subnets_data_filtered.to_excel(writer, sheet_name=sheet_name, index=False)
 
@@ -157,6 +164,7 @@ def main():
         dynamodb_data_filtered = dynamodb_filtered(dynamodb_data_raw)
         region_raw_data["DynamoDB"] = dynamodb_data_raw
         if not dynamodb_data_filtered.empty:
+            region_filtered_data["DynamoDB"] = dynamodb_data_filtered.to_dict("records")
             sheet_name = f"DynamoDB_{region}"[:31]
             dynamodb_data_filtered.to_excel(writer, sheet_name=sheet_name, index=False)
 
@@ -165,6 +173,7 @@ def main():
         elb_data_filtered = elb_filtered(elb_data_raw)
         region_raw_data["ELB"] = elb_data_raw
         if not elb_data_filtered.empty:
+            region_filtered_data["ELB"] = elb_data_filtered.to_dict("records")
             sheet_name = f"ELB_{region}"[:31]
             elb_data_filtered.to_excel(writer, sheet_name=sheet_name, index=False)
 
@@ -173,6 +182,9 @@ def main():
         elasticache_data_filtered = elasticache_filtered(elasticache_data_raw)
         region_raw_data["ElastiCache"] = elasticache_data_raw
         if not elasticache_data_filtered.empty:
+            region_filtered_data["ElastiCache"] = elasticache_data_filtered.to_dict(
+                "records"
+            )
             sheet_name = f"ElastiCache_{region}"[:31]
             elasticache_data_filtered.to_excel(
                 writer, sheet_name=sheet_name, index=False
@@ -183,6 +195,7 @@ def main():
         ebs_data_filtered = ebs_filtered(ebs_data_raw)
         region_raw_data["EBS_Volumes"] = ebs_data_raw
         if not ebs_data_filtered.empty:
+            region_filtered_data["EBS_Volumes"] = ebs_data_filtered.to_dict("records")
             sheet_name = f"EBS_Volumes_{region}"[:31]
             ebs_data_filtered.to_excel(writer, sheet_name=sheet_name, index=False)
 
@@ -191,6 +204,9 @@ def main():
         ebs_snapshot_data_filtered = ebs_snapshot_filtered(ebs_snapshot_data_raw)
         region_raw_data["EBS_Snapshot"] = ebs_snapshot_data_raw
         if not ebs_snapshot_data_filtered.empty:
+            region_filtered_data["EBS_Snapshot"] = ebs_snapshot_data_filtered.to_dict(
+                "records"
+            )
             sheet_name = f"EBS_Snapshot_{region}"[:31]
             ebs_snapshot_data_filtered.to_excel(
                 writer, sheet_name=sheet_name, index=False
@@ -201,6 +217,7 @@ def main():
         amis_data_filtered = amis_filtered(amis_data_raw)
         region_raw_data["AMIs"] = amis_data_raw
         if not amis_data_filtered.empty:
+            region_filtered_data["AMIs"] = amis_data_filtered.to_dict("records")
             sheet_name = f"AMIs_{region}"[:31]
             amis_data_filtered.to_excel(writer, sheet_name=sheet_name, index=False)
 
@@ -209,6 +226,9 @@ def main():
         nat_gateway_data_filtered = nat_gateway_filtered(nat_gateway_data_raw)
         region_raw_data["NAT_Gateway"] = nat_gateway_data_raw
         if not nat_gateway_data_filtered.empty:
+            region_filtered_data["NAT_Gateway"] = nat_gateway_data_filtered.to_dict(
+                "records"
+            )
             sheet_name = f"NAT_{region}"[:31]
             nat_gateway_data_filtered.to_excel(
                 writer, sheet_name=sheet_name, index=False
@@ -219,6 +239,9 @@ def main():
         vpc_endpoint_data_filtered = vpc_endpoint_filtered(vpc_endpoint_data_raw)
         region_raw_data["VPC_Endpoints"] = vpc_endpoint_data_raw
         if not vpc_endpoint_data_filtered.empty:
+            region_filtered_data["VPC_Endpoints"] = vpc_endpoint_data_filtered.to_dict(
+                "records"
+            )
             sheet_name = f"VpcEP_{region}"[:31]
             vpc_endpoint_data_filtered.to_excel(
                 writer, sheet_name=sheet_name, index=False
@@ -231,6 +254,9 @@ def main():
         )
         region_raw_data["KinesisStreams"] = kinesis_streams_data_raw
         if not kinesis_streams_data_filtered.empty:
+            region_filtered_data["KinesisStreams"] = (
+                kinesis_streams_data_filtered.to_dict("records")
+            )
             sheet_name = f"KinesisStreams_{region}"[:31]
             kinesis_streams_data_filtered.to_excel(
                 writer, sheet_name=sheet_name, index=False
@@ -241,6 +267,7 @@ def main():
         glue_job_data_filtered = glue_job_filtered(glue_job_data_raw)
         region_raw_data["GlueJob"] = glue_job_data_raw
         if not glue_job_data_filtered.empty:
+            region_filtered_data["GlueJob"] = glue_job_data_filtered.to_dict("records")
             sheet_name = f"GlueJob_{region}"[:31]
             glue_job_data_filtered.to_excel(writer, sheet_name=sheet_name, index=False)
 
@@ -251,6 +278,9 @@ def main():
         )
         region_raw_data["KinesisFirehose"] = kinesis_firehose_data_raw
         if not kinesis_firehose_data_filtered.empty:
+            region_filtered_data["KinesisFirehose"] = (
+                kinesis_firehose_data_filtered.to_dict("records")
+            )
             sheet_name = f"KinesisFirehose_{region}"[:31]
             kinesis_firehose_data_filtered.to_excel(
                 writer, sheet_name=sheet_name, index=False
@@ -261,6 +291,9 @@ def main():
         secrets_data_filtered = secrets_filtered(secrets_data_raw)
         region_raw_data["SecretsManager"] = secrets_data_raw
         if not secrets_data_filtered.empty:
+            region_filtered_data["SecretsManager"] = secrets_data_filtered.to_dict(
+                "records"
+            )
             sheet_name = f"Secrets_{region}"[:31]
             secrets_data_filtered.to_excel(writer, sheet_name=sheet_name, index=False)
 
@@ -269,6 +302,7 @@ def main():
         eip_data_filtered = eip_filtered(eip_data_raw)
         region_raw_data["EIP"] = eip_data_raw
         if not eip_data_filtered.empty:
+            region_filtered_data["EIP"] = eip_data_filtered.to_dict("records")
             sheet_name = f"EIP_{region}"[:31]
             eip_data_filtered.to_excel(writer, sheet_name=sheet_name, index=False)
 
@@ -279,6 +313,9 @@ def main():
         )
         region_raw_data["InternetGateway"] = internet_gateway_data_raw
         if not internet_gateway_data_filtered.empty:
+            region_filtered_data["InternetGateway"] = (
+                internet_gateway_data_filtered.to_dict("records")
+            )
             sheet_name = f"IGW_{region}"[:31]
             internet_gateway_data_filtered.to_excel(
                 writer, sheet_name=sheet_name, index=False
@@ -291,6 +328,9 @@ def main():
         )
         region_raw_data["SecurityGroups"] = security_groups_data_raw
         if not security_groups_data_filtered.empty:
+            region_filtered_data["SecurityGroups"] = (
+                security_groups_data_filtered.to_dict("records")
+            )
             sheet_name = f"SG_{region}"[:31]
             security_groups_data_filtered.to_excel(
                 writer, sheet_name=sheet_name, index=False
@@ -301,6 +341,7 @@ def main():
         ecr_data_filtered = ecr_filtered(ecr_data_raw)
         region_raw_data["ECR"] = ecr_data_raw
         if not ecr_data_filtered.empty:
+            region_filtered_data["ECR"] = ecr_data_filtered.to_dict("records")
             sheet_name = f"ECR_{region}"[:31]
             ecr_data_filtered.to_excel(writer, sheet_name=sheet_name, index=False)
 
@@ -311,6 +352,9 @@ def main():
         )
         region_raw_data["SecurityGroupRules"] = security_group_rules_data_raw
         if not security_group_rules_data_filtered.empty:
+            region_filtered_data["SecurityGroupRules"] = (
+                security_group_rules_data_filtered.to_dict("records")
+            )
             sheet_name = f"SGRules_{region}"[:31]
             security_group_rules_data_filtered.to_excel(
                 writer, sheet_name=sheet_name, index=False
@@ -323,6 +367,9 @@ def main():
         )
         region_raw_data["AutoScalingGroups"] = auto_scaling_groups_data_raw
         if not auto_scaling_groups_data_filtered.empty:
+            region_filtered_data["AutoScalingGroups"] = (
+                auto_scaling_groups_data_filtered.to_dict("records")
+            )
             sheet_name = f"ASG_{region}"[:31]
             auto_scaling_groups_data_filtered.to_excel(
                 writer, sheet_name=sheet_name, index=False
@@ -334,12 +381,16 @@ def main():
         ses_identity_data_filtered = ses_identity_filtered(ses_identity_data_raw)
         region_raw_data["SESIdentity"] = ses_identity_data_raw
         if not ses_identity_data_filtered.empty:
+            region_filtered_data["SESIdentity"] = ses_identity_data_filtered.to_dict(
+                "records"
+            )
             sheet_name = f"SESIdentity_{region}"[:31]
             ses_identity_data_filtered.to_excel(
                 writer, sheet_name=sheet_name, index=False
             )
 
         all_raw_data[region] = region_raw_data
+        all_filtered_data[region] = region_filtered_data
 
     # --- S3 Buckets (Global) ---
     print("\n=== Collecting S3 Buckets (global) ===")
@@ -348,6 +399,7 @@ def main():
     s3_data_filtered = s3_filtered(s3_data_raw)
     all_raw_data["S3"] = s3_data_raw
     if not s3_data_filtered.empty:
+        all_filtered_data["S3"] = s3_data_filtered.to_dict("records")
         s3_data_filtered.to_excel(writer, sheet_name="S3", index=False)
 
     # --- Global Accelerator (Global) ---
@@ -357,6 +409,7 @@ def main():
     ga_data_filtered = ga_filtered(ga_data_raw)
     all_raw_data["GlobalAccelerator"] = ga_data_raw
     if not ga_data_filtered.empty:
+        all_filtered_data["GlobalAccelerator"] = ga_data_filtered.to_dict("records")
         ga_data_filtered.to_excel(writer, sheet_name="GlobalAccelerator", index=False)
 
     # --- Route53 HostedZone (global) ---
@@ -366,16 +419,28 @@ def main():
     route53_data_filtered = route53_filtered(route53_data_raw)
     all_raw_data["Route53"] = route53_data_raw
     if not route53_data_filtered.empty:
+        all_filtered_data["Route53"] = route53_data_filtered.to_dict("records")
         sheet_name = "Route53"
         route53_data_filtered.to_excel(writer, sheet_name=sheet_name, index=False)
 
     writer.close()
     print(f"[Excel] {excel_path} 생성 완료")
 
-    json_path = os.path.join(data_dir, f"aws_resources_raw_{timestamp}.json")
-    with open(json_path, "w", encoding="utf-8") as f:
+    # Raw 데이터 JSON 파일로 저장
+    json_raw_path = os.path.join(data_dir, f"aws_resources_raw_{timestamp}.json")
+    with open(json_raw_path, "w", encoding="utf-8") as f:
         json.dump(all_raw_data, f, ensure_ascii=False, indent=2, cls=DateTimeEncoder)
-    print(f"[JSON] {json_path} 생성 완료")
+    print(f"[JSON] {json_raw_path} 생성 완료")
+
+    # Filtered 데이터 JSON 파일로 저장
+    json_filtered_path = os.path.join(
+        data_dir, f"aws_resources_filtered_{timestamp}.json"
+    )
+    with open(json_filtered_path, "w", encoding="utf-8") as f:
+        json.dump(
+            all_filtered_data, f, ensure_ascii=False, indent=2, cls=DateTimeEncoder
+        )
+    print(f"[JSON] {json_filtered_path} 생성 완료")
 
 
 if __name__ == "__main__":
