@@ -3,11 +3,10 @@ Tests for S3 buckets resource module.
 """
 
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime, timezone
 from unittest.mock import MagicMock
 
 import pandas as pd
-import pytest
 from botocore.exceptions import ClientError
 
 sys.path.insert(0, ".")
@@ -30,15 +29,11 @@ class TestS3Buckets:
             "Buckets": [
                 {
                     "Name": "test-bucket-1",
-                    "CreationDate": datetime(
-                        2023, 5, 15, 12, 30, 45, tzinfo=timezone.utc
-                    ),
+                    "CreationDate": datetime(2023, 5, 15, 12, 30, 45, tzinfo=UTC),
                 },
                 {
                     "Name": "test-bucket-2",
-                    "CreationDate": datetime(
-                        2023, 6, 20, 8, 15, 30, tzinfo=timezone.utc
-                    ),
+                    "CreationDate": datetime(2023, 6, 20, 8, 15, 30, tzinfo=UTC),
                 },
             ]
         }
@@ -106,15 +101,11 @@ class TestS3Buckets:
             "Buckets": [
                 {
                     "Name": "test-bucket-1",
-                    "CreationDate": datetime(
-                        2023, 5, 15, 12, 30, 45, tzinfo=timezone.utc
-                    ),
+                    "CreationDate": datetime(2023, 5, 15, 12, 30, 45, tzinfo=UTC),
                 },
                 {
                     "Name": "test-bucket-2",
-                    "CreationDate": datetime(
-                        2023, 6, 20, 8, 15, 30, tzinfo=timezone.utc
-                    ),
+                    "CreationDate": datetime(2023, 6, 20, 8, 15, 30, tzinfo=UTC),
                 },
             ]
         }
@@ -152,9 +143,7 @@ class TestS3Buckets:
             "Buckets": [
                 {
                     # Missing Name field
-                    "CreationDate": datetime(
-                        2023, 5, 15, 12, 30, 45, tzinfo=timezone.utc
-                    ),
+                    "CreationDate": datetime(2023, 5, 15, 12, 30, 45, tzinfo=UTC),
                 }
             ]
         }

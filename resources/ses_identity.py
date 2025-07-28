@@ -1,9 +1,9 @@
-from typing import Any, Dict, List
+from typing import Any
 
 import pandas as pd
 
 
-def get_raw_data(session: Any, region: str) -> Dict[str, Any]:
+def get_raw_data(session: Any, region: str) -> dict[str, Any]:
     """
     SES Identity 전체 목록 및 상세 정보를 조회하여 반환
 
@@ -47,7 +47,7 @@ def get_raw_data(session: Any, region: str) -> Dict[str, Any]:
     }
 
 
-def get_filtered_data(raw_data: Dict[str, Any]) -> pd.DataFrame:
+def get_filtered_data(raw_data: dict[str, Any]) -> pd.DataFrame:
     """
     원본 JSON에서 주요 필드만 추출해 DataFrame으로 반환
 
@@ -56,7 +56,7 @@ def get_filtered_data(raw_data: Dict[str, Any]) -> pd.DataFrame:
     - IdentityStatus: 확인 상태 (Success, Pending, Failed, NotStarted, TemporaryFailure)
     - Tags: 태그 정보
     """
-    rows: List[Dict[str, Any]] = []
+    rows: list[dict[str, Any]] = []
     identities = raw_data.get("Identities", [])
     verification_attrs = raw_data.get("VerificationAttributes", {})
     tags_data = raw_data.get("Tags", {})

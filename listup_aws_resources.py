@@ -1,7 +1,7 @@
 import argparse
 import json
 import os
-from datetime import date, datetime, timezone
+from datetime import UTC, date, datetime
 
 import boto3
 import pandas as pd
@@ -68,7 +68,7 @@ from resources.vpc_endpoint import get_raw_data as vpc_endpoint_raw
 
 class DateTimeEncoder(json.JSONEncoder):
     def default(self, obj):
-        if isinstance(obj, (datetime, date)):
+        if isinstance(obj, datetime | date):
             return obj.isoformat()
         return super().default(obj)
 
@@ -76,33 +76,33 @@ class DateTimeEncoder(json.JSONEncoder):
 def get_available_resources():
     """사용 가능한 AWS 리소스 목록을 반환합니다."""
     return {
-        'ec2': 'EC2 인스턴스',
-        'vpc': 'VPC (Virtual Private Cloud)',
-        'rds': 'RDS 데이터베이스',
-        'eks': 'EKS 클러스터',
-        'subnets': '서브넷',
-        'dynamodb': 'DynamoDB 테이블',
-        'elb': 'ELB 로드밸런서',
-        'elasticache': 'ElastiCache',
-        'ebs': 'EBS 볼륨',
-        'ebs_snapshot': 'EBS 스냅샷',
-        'amis': 'AMI 이미지',
-        'nat_gateway': 'NAT 게이트웨이',
-        'vpc_endpoint': 'VPC 엔드포인트',
-        'kinesis_streams': 'Kinesis Data Streams',
-        'glue_job': 'Glue 작업',
-        'kinesis_firehose': 'Kinesis Data Firehose',
-        'secrets_manager': 'Secrets Manager',
-        'eip': 'Elastic IP',
-        'internet_gateway': '인터넷 게이트웨이',
-        'security_groups': '보안 그룹',
-        'ecr': 'ECR 레지스트리',
-        'security_group_rules': '보안 그룹 규칙',
-        'auto_scaling_groups': 'Auto Scaling 그룹',
-        'ses_identity': 'SES Identity',
-        's3': 'S3 버킷 (글로벌)',
-        'global_accelerator': 'Global Accelerator (글로벌)',
-        'route53': 'Route53 호스팅 영역 (글로벌)'
+        "ec2": "EC2 인스턴스",
+        "vpc": "VPC (Virtual Private Cloud)",
+        "rds": "RDS 데이터베이스",
+        "eks": "EKS 클러스터",
+        "subnets": "서브넷",
+        "dynamodb": "DynamoDB 테이블",
+        "elb": "ELB 로드밸런서",
+        "elasticache": "ElastiCache",
+        "ebs": "EBS 볼륨",
+        "ebs_snapshot": "EBS 스냅샷",
+        "amis": "AMI 이미지",
+        "nat_gateway": "NAT 게이트웨이",
+        "vpc_endpoint": "VPC 엔드포인트",
+        "kinesis_streams": "Kinesis Data Streams",
+        "glue_job": "Glue 작업",
+        "kinesis_firehose": "Kinesis Data Firehose",
+        "secrets_manager": "Secrets Manager",
+        "eip": "Elastic IP",
+        "internet_gateway": "인터넷 게이트웨이",
+        "security_groups": "보안 그룹",
+        "ecr": "ECR 레지스트리",
+        "security_group_rules": "보안 그룹 규칙",
+        "auto_scaling_groups": "Auto Scaling 그룹",
+        "ses_identity": "SES Identity",
+        "s3": "S3 버킷 (글로벌)",
+        "global_accelerator": "Global Accelerator (글로벌)",
+        "route53": "Route53 호스팅 영역 (글로벌)",
     }
 
 
@@ -113,7 +113,7 @@ def main():
     선택된 리소스만 조회할 수 있습니다.
     """
     available_resources = get_available_resources()
-    
+
     parser = argparse.ArgumentParser(
         description="AWS 리소스 조회 스크립트",
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -126,31 +126,31 @@ def main():
   python listup_aws_resources.py --region ap-northeast-2 us-east-1  # 특정 리전들
   python listup_aws_resources.py --resources ec2 rds s3             # 특정 리소스들만
   python listup_aws_resources.py --region ap-northeast-2 --resources ec2 vpc security_groups  # 특정 리전, 특정 리소스들
-        """
+        """,
     )
-    
+
     parser.add_argument(
         "--region",
         dest="regions",
         nargs="+",
         default=["ap-northeast-2"],
-        help="조회할 AWS 리전명 (여러 개 가능). 기본값: ap-northeast-2"
+        help="조회할 AWS 리전명 (여러 개 가능). 기본값: ap-northeast-2",
     )
-    
+
     parser.add_argument(
         "--resources",
         dest="selected_resources",
         nargs="+",
         choices=list(available_resources.keys()),
-        help="조회할 AWS 리소스 (여러 개 가능). 지정하지 않으면 모든 리소스를 조회합니다."
+        help="조회할 AWS 리소스 (여러 개 가능). 지정하지 않으면 모든 리소스를 조회합니다.",
     )
-    
+
     parser.add_argument(
         "--list-resources",
         action="store_true",
-        help="사용 가능한 리소스 목록을 출력하고 종료"
+        help="사용 가능한 리소스 목록을 출력하고 종료",
     )
-    
+
     # Check if running in a test environment
     import sys
 
@@ -158,7 +158,7 @@ def main():
         args = parser.parse_args([])  # Pass empty list to avoid parsing test arguments
     else:
         args = parser.parse_args()
-    
+
     # 리소스 목록 출력 후 종료
     if args.list_resources:
         print("🔍 사용 가능한 AWS 리소스:")
@@ -166,21 +166,25 @@ def main():
         for key, desc in available_resources.items():
             print(f"  {key:<20} : {desc}")
         return
-    
+
     regions = args.regions
-    selected_resources = set(args.selected_resources) if args.selected_resources else set(available_resources.keys())
-    
+    selected_resources = (
+        set(args.selected_resources)
+        if args.selected_resources
+        else set(available_resources.keys())
+    )
+
     print("🚀 AWS 리소스 조회 스크립트 시작")
     print("=" * 50)
     print(f"🌍 조회 리전: {', '.join(regions)}")
-    
+
     if args.selected_resources:
         print(f"🎯 선택된 리소스: {', '.join(sorted(selected_resources))}")
     else:
         print("📋 모든 리소스를 조회합니다.")
     print()
 
-    timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S_%f")[:-3]
+    timestamp = datetime.now(UTC).strftime("%Y%m%d_%H%M%S_%f")[:-3]
 
     current_dir = os.path.dirname(__file__)
     data_dir = os.path.join(current_dir, "data")
@@ -199,8 +203,8 @@ def main():
         region_filtered_data = {}
 
         # --- EC2 ---
-        if 'ec2' in selected_resources:
-            print(f"  🖥️  EC2 조회 중...")
+        if "ec2" in selected_resources:
+            print("  🖥️  EC2 조회 중...")
             ec2_data_raw = ec2_raw(session, region)
             ec2_data_filtered = ec2_filtered(ec2_data_raw)
             region_raw_data["EC2"] = ec2_data_raw
@@ -210,8 +214,8 @@ def main():
                 ec2_data_filtered.to_excel(writer, sheet_name=sheet_name, index=False)
 
         # --- VPC ---
-        if 'vpc' in selected_resources:
-            print(f"  🌐 VPC 조회 중...")
+        if "vpc" in selected_resources:
+            print("  🌐 VPC 조회 중...")
             vpc_data_raw = vpc_raw(session, region)
             vpc_data_filtered = vpc_filtered(vpc_data_raw)
             region_raw_data["VPC"] = vpc_data_raw
@@ -221,8 +225,8 @@ def main():
                 vpc_data_filtered.to_excel(writer, sheet_name=sheet_name, index=False)
 
         # --- RDS ---
-        if 'rds' in selected_resources:
-            print(f"  🗄️  RDS 조회 중...")
+        if "rds" in selected_resources:
+            print("  🗄️  RDS 조회 중...")
             rds_data_raw = rds_raw(session, region)
             rds_data_filtered = rds_filtered(rds_data_raw)
             region_raw_data["RDS"] = rds_data_raw
@@ -232,8 +236,8 @@ def main():
                 rds_data_filtered.to_excel(writer, sheet_name=sheet_name, index=False)
 
         # --- EKS ---
-        if 'eks' in selected_resources:
-            print(f"  ☸️  EKS 조회 중...")
+        if "eks" in selected_resources:
+            print("  ☸️  EKS 조회 중...")
             eks_data_raw = eks_raw(session, region)
             eks_data_filtered = eks_filtered(eks_data_raw)
             region_raw_data["EKS"] = eks_data_raw
@@ -243,30 +247,38 @@ def main():
                 eks_data_filtered.to_excel(writer, sheet_name=sheet_name, index=False)
 
         # --- Subnets ---
-        if 'subnets' in selected_resources:
-            print(f"  🔗 Subnets 조회 중...")
+        if "subnets" in selected_resources:
+            print("  🔗 Subnets 조회 중...")
             subnets_data_raw = subnets_raw(session, region)
             subnets_data_filtered = subnets_filtered(subnets_data_raw)
             region_raw_data["Subnets"] = subnets_data_raw
             if not subnets_data_filtered.empty:
-                region_filtered_data["Subnets"] = subnets_data_filtered.to_dict("records")
+                region_filtered_data["Subnets"] = subnets_data_filtered.to_dict(
+                    "records"
+                )
                 sheet_name = f"Subnets_{region}"[:31]
-                subnets_data_filtered.to_excel(writer, sheet_name=sheet_name, index=False)
+                subnets_data_filtered.to_excel(
+                    writer, sheet_name=sheet_name, index=False
+                )
 
         # --- DynamoDB ---
-        if 'dynamodb' in selected_resources:
-            print(f"  📊 DynamoDB 조회 중...")
+        if "dynamodb" in selected_resources:
+            print("  📊 DynamoDB 조회 중...")
             dynamodb_data_raw = dynamodb_raw(session, region)
             dynamodb_data_filtered = dynamodb_filtered(dynamodb_data_raw)
             region_raw_data["DynamoDB"] = dynamodb_data_raw
             if not dynamodb_data_filtered.empty:
-                region_filtered_data["DynamoDB"] = dynamodb_data_filtered.to_dict("records")
+                region_filtered_data["DynamoDB"] = dynamodb_data_filtered.to_dict(
+                    "records"
+                )
                 sheet_name = f"DynamoDB_{region}"[:31]
-                dynamodb_data_filtered.to_excel(writer, sheet_name=sheet_name, index=False)
+                dynamodb_data_filtered.to_excel(
+                    writer, sheet_name=sheet_name, index=False
+                )
 
         # --- ELB (Classic, ALB, NLB) ---
-        if 'elb' in selected_resources:
-            print(f"  ⚖️  ELB 조회 중...")
+        if "elb" in selected_resources:
+            print("  ⚖️  ELB 조회 중...")
             elb_data_raw = elb_raw(session, region)
             elb_data_filtered = elb_filtered(elb_data_raw)
             region_raw_data["ELB"] = elb_data_raw
@@ -276,8 +288,8 @@ def main():
                 elb_data_filtered.to_excel(writer, sheet_name=sheet_name, index=False)
 
         # --- ElastiCache ---
-        if 'elasticache' in selected_resources:
-            print(f"  🚀 ElastiCache 조회 중...")
+        if "elasticache" in selected_resources:
+            print("  🚀 ElastiCache 조회 중...")
             elasticache_data_raw = elasticache_raw(session, region)
             elasticache_data_filtered = elasticache_filtered(elasticache_data_raw)
             region_raw_data["ElastiCache"] = elasticache_data_raw
@@ -291,25 +303,27 @@ def main():
                 )
 
         # --- EBS Volumes ---
-        if 'ebs' in selected_resources:
-            print(f"  💾 EBS Volumes 조회 중...")
+        if "ebs" in selected_resources:
+            print("  💾 EBS Volumes 조회 중...")
             ebs_data_raw = ebs_raw(session, region)
             ebs_data_filtered = ebs_filtered(ebs_data_raw)
             region_raw_data["EBS_Volumes"] = ebs_data_raw
             if not ebs_data_filtered.empty:
-                region_filtered_data["EBS_Volumes"] = ebs_data_filtered.to_dict("records")
+                region_filtered_data["EBS_Volumes"] = ebs_data_filtered.to_dict(
+                    "records"
+                )
                 sheet_name = f"EBS_Volumes_{region}"[:31]
                 ebs_data_filtered.to_excel(writer, sheet_name=sheet_name, index=False)
 
         # --- EBS Snapshot ---
-        if 'ebs_snapshot' in selected_resources:
-            print(f"  📸 EBS Snapshots 조회 중...")
+        if "ebs_snapshot" in selected_resources:
+            print("  📸 EBS Snapshots 조회 중...")
             ebs_snapshot_data_raw = ebs_snapshot_raw(session, region)
             ebs_snapshot_data_filtered = ebs_snapshot_filtered(ebs_snapshot_data_raw)
             region_raw_data["EBS_Snapshot"] = ebs_snapshot_data_raw
             if not ebs_snapshot_data_filtered.empty:
-                region_filtered_data["EBS_Snapshot"] = ebs_snapshot_data_filtered.to_dict(
-                    "records"
+                region_filtered_data["EBS_Snapshot"] = (
+                    ebs_snapshot_data_filtered.to_dict("records")
                 )
                 sheet_name = f"EBS_Snapshot_{region}"[:31]
                 ebs_snapshot_data_filtered.to_excel(
@@ -317,8 +331,8 @@ def main():
                 )
 
         # --- AMIs (Owner=self) ---
-        if 'amis' in selected_resources:
-            print(f"  🖼️  AMIs 조회 중...")
+        if "amis" in selected_resources:
+            print("  🖼️  AMIs 조회 중...")
             amis_data_raw = amis_raw(session, region)
             amis_data_filtered = amis_filtered(amis_data_raw)
             region_raw_data["AMIs"] = amis_data_raw
@@ -328,8 +342,8 @@ def main():
                 amis_data_filtered.to_excel(writer, sheet_name=sheet_name, index=False)
 
         # --- NAT Gateway ---
-        if 'nat_gateway' in selected_resources:
-            print(f"  🌉 NAT Gateway 조회 중...")
+        if "nat_gateway" in selected_resources:
+            print("  🌉 NAT Gateway 조회 중...")
             nat_gateway_data_raw = nat_gateway_raw(session, region)
             nat_gateway_data_filtered = nat_gateway_filtered(nat_gateway_data_raw)
             region_raw_data["NAT_Gateway"] = nat_gateway_data_raw
@@ -343,14 +357,14 @@ def main():
                 )
 
         # --- VPC Endpoints ---
-        if 'vpc_endpoint' in selected_resources:
-            print(f"  🔌 VPC Endpoints 조회 중...")
+        if "vpc_endpoint" in selected_resources:
+            print("  🔌 VPC Endpoints 조회 중...")
             vpc_endpoint_data_raw = vpc_endpoint_raw(session, region)
             vpc_endpoint_data_filtered = vpc_endpoint_filtered(vpc_endpoint_data_raw)
             region_raw_data["VPC_Endpoints"] = vpc_endpoint_data_raw
             if not vpc_endpoint_data_filtered.empty:
-                region_filtered_data["VPC_Endpoints"] = vpc_endpoint_data_filtered.to_dict(
-                    "records"
+                region_filtered_data["VPC_Endpoints"] = (
+                    vpc_endpoint_data_filtered.to_dict("records")
                 )
                 sheet_name = f"VpcEP_{region}"[:31]
                 vpc_endpoint_data_filtered.to_excel(
@@ -358,8 +372,8 @@ def main():
                 )
 
         # --- Kinesis Data Streams ---
-        if 'kinesis_streams' in selected_resources:
-            print(f"  🌊 Kinesis Streams 조회 중...")
+        if "kinesis_streams" in selected_resources:
+            print("  🌊 Kinesis Streams 조회 중...")
             kinesis_streams_data_raw = kinesis_streams_raw(session, region)
             kinesis_streams_data_filtered = kinesis_streams_filtered(
                 kinesis_streams_data_raw
@@ -375,19 +389,23 @@ def main():
                 )
 
         # --- Glue Job ---
-        if 'glue_job' in selected_resources:
-            print(f"  🔧 Glue Jobs 조회 중...")
+        if "glue_job" in selected_resources:
+            print("  🔧 Glue Jobs 조회 중...")
             glue_job_data_raw = glue_job_raw(session, region)
             glue_job_data_filtered = glue_job_filtered(glue_job_data_raw)
             region_raw_data["GlueJob"] = glue_job_data_raw
             if not glue_job_data_filtered.empty:
-                region_filtered_data["GlueJob"] = glue_job_data_filtered.to_dict("records")
+                region_filtered_data["GlueJob"] = glue_job_data_filtered.to_dict(
+                    "records"
+                )
                 sheet_name = f"GlueJob_{region}"[:31]
-                glue_job_data_filtered.to_excel(writer, sheet_name=sheet_name, index=False)
+                glue_job_data_filtered.to_excel(
+                    writer, sheet_name=sheet_name, index=False
+                )
 
         # --- Kinesis Data Firehose ---
-        if 'kinesis_firehose' in selected_resources:
-            print(f"  🚒 Kinesis Firehose 조회 중...")
+        if "kinesis_firehose" in selected_resources:
+            print("  🚒 Kinesis Firehose 조회 중...")
             kinesis_firehose_data_raw = kinesis_firehose_raw(session, region)
             kinesis_firehose_data_filtered = kinesis_firehose_filtered(
                 kinesis_firehose_data_raw
@@ -403,8 +421,8 @@ def main():
                 )
 
         # --- Secrets Manager ---
-        if 'secrets_manager' in selected_resources:
-            print(f"  🔐 Secrets Manager 조회 중...")
+        if "secrets_manager" in selected_resources:
+            print("  🔐 Secrets Manager 조회 중...")
             secrets_data_raw = secrets_raw(session, region)
             secrets_data_filtered = secrets_filtered(secrets_data_raw)
             region_raw_data["SecretsManager"] = secrets_data_raw
@@ -413,11 +431,13 @@ def main():
                     "records"
                 )
                 sheet_name = f"Secrets_{region}"[:31]
-                secrets_data_filtered.to_excel(writer, sheet_name=sheet_name, index=False)
+                secrets_data_filtered.to_excel(
+                    writer, sheet_name=sheet_name, index=False
+                )
 
         # --- Elastic IP ---
-        if 'eip' in selected_resources:
-            print(f"  🌐 Elastic IP 조회 중...")
+        if "eip" in selected_resources:
+            print("  🌐 Elastic IP 조회 중...")
             eip_data_raw = eip_raw(session, region)
             eip_data_filtered = eip_filtered(eip_data_raw)
             region_raw_data["EIP"] = eip_data_raw
@@ -427,8 +447,8 @@ def main():
                 eip_data_filtered.to_excel(writer, sheet_name=sheet_name, index=False)
 
         # --- Internet Gateway ---
-        if 'internet_gateway' in selected_resources:
-            print(f"  🌍 Internet Gateway 조회 중...")
+        if "internet_gateway" in selected_resources:
+            print("  🌍 Internet Gateway 조회 중...")
             internet_gateway_data_raw = internet_gateway_raw(session, region)
             internet_gateway_data_filtered = internet_gateway_filtered(
                 internet_gateway_data_raw
@@ -444,8 +464,8 @@ def main():
                 )
 
         # --- Security Groups ---
-        if 'security_groups' in selected_resources:
-            print(f"  🛡️  Security Groups 조회 중...")
+        if "security_groups" in selected_resources:
+            print("  🛡️  Security Groups 조회 중...")
             security_groups_data_raw = security_groups_raw(session, region)
             security_groups_data_filtered = security_groups_filtered(
                 security_groups_data_raw
@@ -461,8 +481,8 @@ def main():
                 )
 
         # --- ECR ---
-        if 'ecr' in selected_resources:
-            print(f"  📦 ECR 조회 중...")
+        if "ecr" in selected_resources:
+            print("  📦 ECR 조회 중...")
             ecr_data_raw = ecr_raw(session, region)
             ecr_data_filtered = ecr_filtered(ecr_data_raw)
             region_raw_data["ECR"] = ecr_data_raw
@@ -472,8 +492,8 @@ def main():
                 ecr_data_filtered.to_excel(writer, sheet_name=sheet_name, index=False)
 
         # --- Security Group Rules ---
-        if 'security_group_rules' in selected_resources:
-            print(f"  📋 Security Group Rules 조회 중...")
+        if "security_group_rules" in selected_resources:
+            print("  📋 Security Group Rules 조회 중...")
             security_group_rules_data_raw = security_group_rules_raw(session, region)
             security_group_rules_data_filtered = security_group_rules_filtered(
                 security_group_rules_data_raw
@@ -489,8 +509,8 @@ def main():
                 )
 
         # --- Auto Scaling Groups ---
-        if 'auto_scaling_groups' in selected_resources:
-            print(f"  📈 Auto Scaling Groups 조회 중...")
+        if "auto_scaling_groups" in selected_resources:
+            print("  📈 Auto Scaling Groups 조회 중...")
             auto_scaling_groups_data_raw = auto_scaling_groups_raw(session, region)
             auto_scaling_groups_data_filtered = auto_scaling_groups_filtered(
                 auto_scaling_groups_data_raw
@@ -506,14 +526,14 @@ def main():
                 )
 
         # --- SES Identity (Email) ---
-        if 'ses_identity' in selected_resources:
-            print(f"  📧 SES Identity 조회 중...")
+        if "ses_identity" in selected_resources:
+            print("  📧 SES Identity 조회 중...")
             ses_identity_data_raw = ses_identity_raw(session, region)
             ses_identity_data_filtered = ses_identity_filtered(ses_identity_data_raw)
             region_raw_data["SESIdentity"] = ses_identity_data_raw
             if not ses_identity_data_filtered.empty:
-                region_filtered_data["SESIdentity"] = ses_identity_data_filtered.to_dict(
-                    "records"
+                region_filtered_data["SESIdentity"] = (
+                    ses_identity_data_filtered.to_dict("records")
                 )
                 sheet_name = f"SESIdentity_{region}"[:31]
                 ses_identity_data_filtered.to_excel(
@@ -524,7 +544,7 @@ def main():
         all_filtered_data[region] = region_filtered_data
 
     # --- S3 Buckets (Global) ---
-    if 's3' in selected_resources:
+    if "s3" in selected_resources:
         print("\n🪣 S3 Buckets (글로벌) 조회 중...")
         s3_session = boto3.Session(region_name="us-east-1")
         s3_data_raw = s3_raw(s3_session)
@@ -535,7 +555,7 @@ def main():
             s3_data_filtered.to_excel(writer, sheet_name="S3", index=False)
 
     # --- Global Accelerator (Global) ---
-    if 'global_accelerator' in selected_resources:
+    if "global_accelerator" in selected_resources:
         print("\n🚀 Global Accelerator (글로벌) 조회 중...")
         ga_session = boto3.Session(region_name="us-west-2")
         ga_data_raw = ga_raw(ga_session, "us-west-2")
@@ -543,10 +563,12 @@ def main():
         all_raw_data["GlobalAccelerator"] = ga_data_raw
         if not ga_data_filtered.empty:
             all_filtered_data["GlobalAccelerator"] = ga_data_filtered.to_dict("records")
-            ga_data_filtered.to_excel(writer, sheet_name="GlobalAccelerator", index=False)
+            ga_data_filtered.to_excel(
+                writer, sheet_name="GlobalAccelerator", index=False
+            )
 
     # --- Route53 HostedZone (global) ---
-    if 'route53' in selected_resources:
+    if "route53" in selected_resources:
         print("\n🌐 Route53 HostedZones (글로벌) 조회 중...")
         route53_session = boto3.Session()  # 글로벌 서비스
         route53_data_raw = route53_raw(route53_session, None)
@@ -575,33 +597,33 @@ def main():
             all_filtered_data, f, ensure_ascii=False, indent=2, cls=DateTimeEncoder
         )
     print(f"📄 Filtered JSON 파일 생성 완료: {json_filtered_path}")
-    
+
     # 요약 정보 출력
-    print(f"\n✅ AWS 리소스 조회 완료!")
+    print("\n✅ AWS 리소스 조회 완료!")
     print(f"🌍 조회된 리전: {', '.join(regions)}")
     if args.selected_resources:
         print(f"🎯 조회된 리소스: {', '.join(sorted(selected_resources))}")
     else:
-        print(f"📋 모든 리소스가 조회되었습니다.")
-    
+        print("📋 모든 리소스가 조회되었습니다.")
+
     # 각 리전별 조회된 리소스 수 계산
     total_resources = 0
     for region, region_data in all_filtered_data.items():
-        if region not in ['S3', 'GlobalAccelerator', 'Route53']:  # 글로벌 리소스 제외
+        if region not in ["S3", "GlobalAccelerator", "Route53"]:  # 글로벌 리소스 제외
             resource_count = sum(len(resources) for resources in region_data.values())
             if resource_count > 0:
                 print(f"  📍 {region}: {resource_count}개 리소스")
                 total_resources += resource_count
-    
+
     # 글로벌 리소스 수 계산
     global_resources = 0
-    for global_service in ['S3', 'GlobalAccelerator', 'Route53']:
+    for global_service in ["S3", "GlobalAccelerator", "Route53"]:
         if global_service in all_filtered_data:
             count = len(all_filtered_data[global_service])
             if count > 0:
                 print(f"  🌐 {global_service}: {count}개 리소스")
                 global_resources += count
-    
+
     print(f"📊 총 조회된 리소스: {total_resources + global_resources}개")
 
 

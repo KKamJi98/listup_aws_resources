@@ -4,7 +4,7 @@ AWS S3 buckets resource module.
 This module provides functions to retrieve and filter AWS S3 buckets data.
 """
 
-from typing import Any, Dict, Optional
+from typing import Any
 
 import pandas as pd
 from botocore.exceptions import ClientError
@@ -12,7 +12,7 @@ from botocore.exceptions import ClientError
 from utils.datetime_format import format_datetime
 
 
-def get_raw_data(session: Any, region: Optional[str] = None) -> Dict[str, Any]:
+def get_raw_data(session: Any, region: str | None = None) -> dict[str, Any]:
     """
     S3 버킷 목록 조회
     정확한 CreationDate를 얻기 위해서는 us-east-1 리전에서 조회해야 함
@@ -36,7 +36,7 @@ def get_raw_data(session: Any, region: Optional[str] = None) -> Dict[str, Any]:
         return {"Buckets": []}
 
 
-def get_filtered_data(raw_data: Dict[str, Any]) -> pd.DataFrame:
+def get_filtered_data(raw_data: dict[str, Any]) -> pd.DataFrame:
     """
     원본 JSON에서 주요 필드만 추출해 DataFrame으로 반환
 

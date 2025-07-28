@@ -4,13 +4,13 @@ AWS Security Groups resource module.
 This module provides functions to retrieve and filter AWS Security Groups data.
 """
 
-from typing import Any, Dict, List
+from typing import Any
 
 import pandas as pd
 from botocore.exceptions import ClientError
 
 
-def get_raw_data(session: Any, region: str) -> List[Dict[str, Any]]:
+def get_raw_data(session: Any, region: str) -> list[dict[str, Any]]:
     """
     AWS Security Group 리소스 정보를 조회합니다.
 
@@ -46,7 +46,7 @@ def get_raw_data(session: Any, region: str) -> List[Dict[str, Any]]:
         return []
 
 
-def _check_any_open_inbound(sg: Dict[str, Any]) -> bool:
+def _check_any_open_inbound(sg: dict[str, Any]) -> bool:
     """
     보안 그룹에 0.0.0.0/0 또는 ::/0 인바운드 규칙이 있는지 확인합니다.
 
@@ -70,7 +70,7 @@ def _check_any_open_inbound(sg: Dict[str, Any]) -> bool:
     return False
 
 
-def get_filtered_data(raw_data: List[Dict[str, Any]]) -> pd.DataFrame:
+def get_filtered_data(raw_data: list[dict[str, Any]]) -> pd.DataFrame:
     """
     원시 Security Group 데이터를 필터링하여 필요한 정보만 추출합니다.
 
@@ -109,7 +109,7 @@ def get_filtered_data(raw_data: List[Dict[str, Any]]) -> pd.DataFrame:
     return pd.DataFrame(filtered_data)
 
 
-def _format_rules(rules: List[Dict[str, Any]], direction: str) -> List[str]:
+def _format_rules(rules: list[dict[str, Any]], direction: str) -> list[str]:
     """
     보안 그룹 규칙을 문자열 형태로 포맷팅합니다.
 
@@ -187,7 +187,7 @@ def _format_rules(rules: List[Dict[str, Any]], direction: str) -> List[str]:
     return formatted_rules
 
 
-def _format_tags(tags: List[Dict[str, str]]) -> str:
+def _format_tags(tags: list[dict[str, str]]) -> str:
     """
     태그 목록을 문자열로 포맷팅합니다.
 

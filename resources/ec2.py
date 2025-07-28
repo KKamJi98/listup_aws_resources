@@ -4,7 +4,7 @@ AWS EC2 instances resource module.
 This module provides functions to retrieve and filter AWS EC2 instances data.
 """
 
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 from botocore.exceptions import ClientError
@@ -13,7 +13,7 @@ from utils.datetime_format import format_datetime
 from utils.name_tag import extract_name_tag
 
 
-def get_raw_data(session: Any, region: str) -> Dict[str, Any]:
+def get_raw_data(session: Any, region: str) -> dict[str, Any]:
     """
     EC2 인스턴스 전체 목록 describe_instances() 결과(원본 JSON)를 반환
 
@@ -36,7 +36,7 @@ def get_raw_data(session: Any, region: str) -> Dict[str, Any]:
         return {"Reservations": []}
 
 
-def get_filtered_data(raw_data: Dict[str, Any]) -> pd.DataFrame:
+def get_filtered_data(raw_data: dict[str, Any]) -> pd.DataFrame:
     """
     원본 JSON에서 주요 필드만 추출해 DataFrame으로 반환
 

@@ -30,12 +30,4 @@ def get_filtered_data(raw_data):
         }
         rows.append(row)
     return pd.DataFrame(rows)
-
-
-def extract_name_tag(tags):
-    if not tags:
-        return None
-    for t in tags:
-        if t.get("Key") == "Name":
-            return t.get("Value")
     return None
