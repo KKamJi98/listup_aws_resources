@@ -73,6 +73,80 @@ class DateTimeEncoder(json.JSONEncoder):
         return super().default(obj)
 
 
+def print_security_groups_analysis(all_filtered_data: dict):
+    """
+    Security Groups 전용 조회 시 상세한 보안 분석을 출력합니다.
+
+    Args:
+        all_filtered_data: 필터링된 데이터 딕셔너리
+    """
+    print("\n🔍 Security Groups 보안 분석 결과:")
+    print("=" * 50)
+
+    total_security_groups = 0
+    total_any_open = 0
+    any_open_details = []
+
+    # 각 리전별 Security Groups 분석
+    for region, region_data in all_filtered_data.items():
+        if region in ["S3", "GlobalAccelerator", "Route53"]:  # 글로벌 리소스 제외
+            continue
+
+        if "SecurityGroups" in region_data:
+            sg_data = region_data["SecurityGroups"]
+            region_total = len(sg_data)
+            region_any_open = len(
+                [sg for sg in sg_data if sg.get("AnyOpenInbound") == "⚠️ YES"]
+            )
+
+            total_security_groups += region_total
+            total_any_open += region_any_open
+
+            if region_total > 0:
+                print(f"📍 {region}: {region_total}개 Security Groups", end="")
+                if region_any_open > 0:
+                    print(f" (⚠️ {region_any_open}개 AnyOpen)")
+                    # AnyOpen Security Groups 상세 정보 수집
+                    for sg in sg_data:
+                        if sg.get("AnyOpenInbound") == "⚠️ YES":
+                            any_open_details.append(
+                                {
+                                    "region": region,
+                                    "id": sg.get("SecurityGroupId", ""),
+                                    "name": sg.get("SecurityGroupName", ""),
+                                    "vpc": sg.get("VpcId", ""),
+                                }
+                            )
+                else:
+                    print(" (✅ 모두 안전)")
+
+    # 전체 요약
+    print("\n📊 전체 요약:")
+    print(f"  🛡️  총 Security Groups: {total_security_groups}개")
+    print(f"  ⚠️  AnyOpen 인바운드 규칙: {total_any_open}개")
+
+    if total_any_open > 0:
+        security_percentage = (
+            (total_security_groups - total_any_open) / total_security_groups
+        ) * 100
+        print(
+            f"  📈 보안 점수: {security_percentage:.1f}% ({total_security_groups - total_any_open}/{total_security_groups})"
+        )
+
+        print("\n⚠️  보안 주의가 필요한 Security Groups:")
+        for detail in any_open_details:
+            print(f"    - {detail['id']} ({detail['name']}) in {detail['region']}")
+            if detail["vpc"]:
+                print(f"      VPC: {detail['vpc']}")
+
+        print("\n💡 보안 권장사항:")
+        print("  • 0.0.0.0/0 또는 ::/0 인바운드 규칙을 특정 IP 범위로 제한하세요")
+        print("  • 필요한 포트만 열어두고 불필요한 포트는 차단하세요")
+        print("  • 정기적으로 Security Groups 규칙을 검토하세요")
+    else:
+        print("  ✅ 모든 Security Groups가 안전합니다!")
+
+
 def get_available_resources():
     """사용 가능한 AWS 리소스 목록을 반환합니다."""
     return {
@@ -126,6 +200,8 @@ def main():
   python listup_aws_resources.py --region ap-northeast-2 us-east-1  # 특정 리전들
   python listup_aws_resources.py --resources ec2 rds s3             # 특정 리소스들만
   python listup_aws_resources.py --region ap-northeast-2 --resources ec2 vpc security_groups  # 특정 리전, 특정 리소스들
+  python listup_aws_resources.py --resources security_groups        # Security Groups 전용 (상세 보안 분석 포함)
+  python listup_aws_resources.py --resources security_groups --region ap-southeast-1  # 특정 리전 Security Groups 분석
         """,
     )
 
@@ -625,6 +701,10 @@ def main():
                 global_resources += count
 
     print(f"📊 총 조회된 리소스: {total_resources + global_resources}개")
+
+    # Security Groups만 선택된 경우 상세 보안 분석 출력
+    if selected_resources == {"security_groups"}:
+        print_security_groups_analysis(all_filtered_data)
 
 
 if __name__ == "__main__":

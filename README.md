@@ -8,7 +8,7 @@ AWS 리소스를 나열하고 정리하는 스크립트입니다. 특정 AWS 계
 
 - **리소스 선택 기능**: 원하는 AWS 리소스만 선택적으로 조회 가능
 - **다중 리전 지원**: 여러 리전을 동시에 조회
-- **Security Groups 전용 스크립트**: `listup_security_groups.py` 추가
+- **Security Groups 전용 분석**: `--resources security_groups`로 상세한 보안 분석 제공
 - **향상된 사용자 경험**: 진행 상황 표시 및 결과 요약
 
 ## 기능
@@ -66,9 +66,7 @@ listup_aws_resources/
 ├── data/
 │   ├── aws_resources_{timestamp}.xlsx
 │   ├── aws_resources_raw_{timestamp}.json
-│   ├── aws_resources_filtered_{timestamp}.json
-│   ├── security_groups_{timestamp}.xlsx
-│   └── security_groups_raw_{timestamp}.json
+│   └── aws_resources_filtered_{timestamp}.json
 ├── resources/
 │   ├── amis.py
 │   ├── auto_scaling_groups.py
@@ -107,7 +105,6 @@ listup_aws_resources/
 │   ├── datetime_format.py
 │   └── name_tag.py
 ├── listup_aws_resources.py
-├── listup_security_groups.py
 ├── pyproject.toml
 ├── uv.lock
 └── README.md
@@ -176,17 +173,17 @@ python listup_aws_resources.py --help
 ### 2. Security Groups 전용 조회
 
 ```bash
-# 모든 리전의 Security Groups 조회
-python listup_security_groups.py
+# Security Groups만 조회 (상세 보안 분석 포함)
+python listup_aws_resources.py --resources security_groups
 
 # 특정 리전의 Security Groups 조회
-python listup_security_groups.py --region ap-southeast-1
+python listup_aws_resources.py --resources security_groups --region ap-southeast-1
 
 # 여러 리전의 Security Groups 조회
-python listup_security_groups.py --region ap-northeast-2 us-east-1
+python listup_aws_resources.py --resources security_groups --region ap-northeast-2 us-east-1
 
 # 도움말
-python listup_security_groups.py --help
+python listup_aws_resources.py --help
 ```
 
 ## 개발 및 테스트
@@ -230,9 +227,11 @@ uv run pytest -v && uv run isort --check-only . && uv run black --check .
 - **Filtered JSON 파일**: `aws_resources_filtered_{timestamp}.json` - 가공되고 필터링된 데이터 (Excel과 동일한 내용)
 
 ### Security Groups 전용 조회 결과
-- **Excel 파일**: `security_groups_{timestamp}.xlsx` - Security Groups 상세 정보
-- **Raw JSON 파일**: `security_groups_raw_{timestamp}.json` - 원본 데이터
-- **Filtered JSON 파일**: `security_groups_filtered_{timestamp}.json` - 가공된 데이터
+Security Groups만 조회할 때도 동일한 파일 형식으로 저장되며, 추가로 상세한 보안 분석 결과가 콘솔에 출력됩니다:
+- 리전별 Security Groups 수 및 AnyOpen 규칙 통계
+- 전체 보안 점수 계산
+- 보안 주의가 필요한 Security Groups 목록
+- 보안 권장사항 제공
 
 ## 주요 개선사항
 
@@ -279,6 +278,11 @@ python listup_aws_resources.py --resources s3 route53 global_accelerator
 ### 특정 리전의 보안 관련 리소스 조회
 ```bash
 python listup_aws_resources.py --region ap-northeast-2 --resources security_groups secrets_manager
+```
+
+### Security Groups 전용 보안 분석
+```bash
+python listup_aws_resources.py --resources security_groups --region ap-southeast-1
 ```
 
 ## TODO
