@@ -4,14 +4,60 @@ AWS 리소스를 나열하고 정리하는 스크립트입니다. 특정 AWS 계
 
 추가하고 싶은 AWS 리소스가 있다면, `resources` 폴더에 새로운 리소스를 정의할 수 있습니다. (PR 환영합니다!)
 
+## 🚀 새로운 기능
+
+- **리소스 선택 기능**: 원하는 AWS 리소스만 선택적으로 조회 가능
+- **다중 리전 지원**: 여러 리전을 동시에 조회
+- **Security Groups 전용 스크립트**: `listup_security_groups.py` 추가
+- **향상된 사용자 경험**: 진행 상황 표시 및 결과 요약
+
 ## 기능
 
-- 다양한 AWS 리소스(EKS, EC2, S3, RDS, DynamoDB, Route53, EIP, Internet Gateway, Security Group 등)를 손쉽게 조회할 수 있습니다.
-- 조회된 결과는 Excel 및 JSON 형식으로 저장됩니다.
-- Security Group 리소스에서 0.0.0.0/0 또는 ::/0 AnyOpen된 Inbound Rule을 가진 항목은 '⚠️ YES'로 표시됩니다.
-- IPv6 범위, Prefix List ID, 보안 그룹 참조 등 모든 유형의 보안 그룹 규칙을 완전히 지원합니다.
-- SES Identity 리소스에서 이메일 자격 증명의 확인 상태, DKIM 상태, 알림 설정 등을 확인할 수 있습니다.
-- 강력한 에러 처리와 타입 힌트로 안정성과 가독성을 보장합니다.
+- **27개 AWS 리소스** 지원 (EKS, EC2, S3, RDS, DynamoDB, Route53, EIP, Internet Gateway, Security Group 등)
+- 조회된 결과는 **Excel 및 JSON** 형식으로 저장
+- **Security Group** 리소스에서 0.0.0.0/0 또는 ::/0 AnyOpen된 Inbound Rule을 가진 항목은 '⚠️ YES'로 표시
+- **IPv6 범위, Prefix List ID, 보안 그룹 참조** 등 모든 유형의 보안 그룹 규칙을 완전히 지원
+- **SES Identity** 리소스에서 이메일 자격 증명의 확인 상태, DKIM 상태, 알림 설정 등을 확인
+- 강력한 **에러 처리**와 **타입 힌트**로 안정성과 가독성을 보장
+
+## 지원되는 AWS 리소스 (27개)
+
+### 컴퓨팅 & 컨테이너
+- **EC2** - 가상 서버 인스턴스
+- **EKS** - Kubernetes 클러스터
+- **ECR** - 컨테이너 레지스트리
+- **Auto Scaling Groups** - 오토스케일링 그룹
+- **AMIs** - Amazon Machine Images
+
+### 네트워킹
+- **VPC** - 가상 프라이빗 클라우드
+- **Subnets** - 서브넷
+- **Security Groups** - 보안 그룹
+- **Security Group Rules** - 보안 그룹 규칙
+- **EIP** - Elastic IP 주소
+- **Internet Gateway** - 인터넷 게이트웨이
+- **NAT Gateway** - NAT 게이트웨이
+- **VPC Endpoints** - VPC 엔드포인트
+- **ELB** - 로드 밸런서 (Classic, ALB, NLB)
+
+### 스토리지
+- **S3** - 객체 스토리지 (글로벌)
+- **EBS Volumes** - 블록 스토리지
+- **EBS Snapshots** - EBS 스냅샷
+
+### 데이터베이스 & 캐시
+- **RDS** - 관계형 데이터베이스
+- **DynamoDB** - NoSQL 데이터베이스
+- **ElastiCache** - 인메모리 캐시
+
+### 기타 서비스
+- **Route53** - DNS 서비스 (글로벌)
+- **Global Accelerator** - 글로벌 가속기 (글로벌)
+- **Kinesis Streams** - 실시간 데이터 스트리밍
+- **Kinesis Firehose** - 데이터 전송 서비스
+- **Glue Jobs** - ETL 작업
+- **Secrets Manager** - 비밀 관리
+- **SES Identity** - 이메일 서비스
 
 ## 프로젝트 구조
 
@@ -20,7 +66,9 @@ listup_aws_resources/
 ├── data/
 │   ├── aws_resources_{timestamp}.xlsx
 │   ├── aws_resources_raw_{timestamp}.json
-│   └── aws_resources_filtered_{timestamp}.json
+│   ├── aws_resources_filtered_{timestamp}.json
+│   ├── security_groups_{timestamp}.xlsx
+│   └── security_groups_raw_{timestamp}.json
 ├── resources/
 │   ├── amis.py
 │   ├── auto_scaling_groups.py
@@ -59,6 +107,7 @@ listup_aws_resources/
 │   ├── datetime_format.py
 │   └── name_tag.py
 ├── listup_aws_resources.py
+├── listup_security_groups.py
 ├── pyproject.toml
 ├── uv.lock
 └── README.md
@@ -94,10 +143,50 @@ export AWS_SECRET_ACCESS_KEY=<your_secret_key>
 export AWS_DEFAULT_REGION=<your_region>
 ```
 
-5. 프로그램을 실행합니다.
+## 사용 방법
+
+### 1. 전체 AWS 리소스 조회
+
+#### 기본 사용법
+```bash
+# 모든 리소스, 기본 리전 (ap-northeast-2)
+python listup_aws_resources.py
+
+# 특정 리전들에서 모든 리소스 조회
+python listup_aws_resources.py --region ap-northeast-2 us-east-1 ap-southeast-1
+```
+
+#### 특정 리소스만 조회
+```bash
+# 특정 리소스들만 조회
+python listup_aws_resources.py --resources ec2 rds s3
+
+# 특정 리전에서 특정 리소스들만 조회
+python listup_aws_resources.py --region ap-southeast-1 --resources ec2 vpc security_groups
+
+# 사용 가능한 리소스 목록 확인
+python listup_aws_resources.py --list-resources
+```
+
+#### 도움말
+```bash
+python listup_aws_resources.py --help
+```
+
+### 2. Security Groups 전용 조회
 
 ```bash
-python listup_aws_resources.py
+# 모든 리전의 Security Groups 조회
+python listup_security_groups.py
+
+# 특정 리전의 Security Groups 조회
+python listup_security_groups.py --region ap-southeast-1
+
+# 여러 리전의 Security Groups 조회
+python listup_security_groups.py --region ap-northeast-2 us-east-1
+
+# 도움말
+python listup_security_groups.py --help
 ```
 
 ## 개발 및 테스트
@@ -135,12 +224,22 @@ uv run pytest -v && uv run isort --check-only . && uv run black --check .
 
 ## 결과물
 
-- 조회된 리소스 목록은 `data` 폴더 내에 Excel 및 JSON 형식으로 저장됩니다.
-- **Excel 파일**: 가공된 데이터 (읽기 쉬운 형태로 변환)
-- **Raw JSON 파일**: AWS API에서 받은 원본 데이터 그대로
-- **Filtered JSON 파일**: 가공되고 필터링된 데이터 (Excel과 동일한 내용)
+### 전체 리소스 조회 결과
+- **Excel 파일**: `aws_resources_{timestamp}.xlsx` - 가공된 데이터 (읽기 쉬운 형태로 변환)
+- **Raw JSON 파일**: `aws_resources_raw_{timestamp}.json` - AWS API에서 받은 원본 데이터 그대로
+- **Filtered JSON 파일**: `aws_resources_filtered_{timestamp}.json` - 가공되고 필터링된 데이터 (Excel과 동일한 내용)
+
+### Security Groups 전용 조회 결과
+- **Excel 파일**: `security_groups_{timestamp}.xlsx` - Security Groups 상세 정보
+- **Raw JSON 파일**: `security_groups_raw_{timestamp}.json` - 원본 데이터
+- **Filtered JSON 파일**: `security_groups_filtered_{timestamp}.json` - 가공된 데이터
 
 ## 주요 개선사항
+
+### 리소스 선택 기능
+- 원하는 AWS 리소스만 선택적으로 조회 가능
+- 시간 절약 및 효율적인 리소스 관리
+- 27개 리소스 중 필요한 것만 선택
 
 ### Security Groups 모듈
 - IPv4 (0.0.0.0/0) 및 IPv6 (::/0) AnyOpen 규칙 감지
@@ -148,11 +247,39 @@ uv run pytest -v && uv run isort --check-only . && uv run black --check .
 - 향상된 에러 처리 및 타입 힌트
 - 포괄적인 테스트 커버리지
 
+### 사용자 경험 개선
+- 진행 상황 표시 (이모지 포함)
+- 조회 결과 요약 정보
+- 리전별 리소스 수 통계
+- 명확한 도움말 및 사용 예시
+
 ### 공통 개선사항
 - 모든 모듈에 타입 힌트 추가
 - 강화된 에러 처리 (ClientError 및 일반 예외)
 - 표준화된 datetime 포맷팅 유틸리티 사용
 - 포괄적인 단위 테스트 작성
+
+## 사용 예시
+
+### 네트워킹 리소스만 조회
+```bash
+python listup_aws_resources.py --resources vpc subnets security_groups internet_gateway nat_gateway
+```
+
+### 컴퓨팅 리소스만 조회
+```bash
+python listup_aws_resources.py --resources ec2 eks ecr auto_scaling_groups amis
+```
+
+### 글로벌 리소스만 조회
+```bash
+python listup_aws_resources.py --resources s3 route53 global_accelerator
+```
+
+### 특정 리전의 보안 관련 리소스 조회
+```bash
+python listup_aws_resources.py --region ap-northeast-2 --resources security_groups secrets_manager
+```
 
 ## TODO
 
@@ -160,6 +287,11 @@ uv run pytest -v && uv run isort --check-only . && uv run black --check .
 - [x] Security Groups에서 IPv6 및 Prefix List 지원 추가
 - [x] 모든 모듈에 타입 힌트 및 에러 처리 개선
 - [x] 포괄적인 테스트 커버리지 구현
+- [x] 리소스 선택 기능 추가
+- [x] Security Groups 전용 스크립트 추가
+- [ ] Lambda Functions 리소스 추가
+- [ ] CloudWatch Alarms 리소스 추가
+- [ ] IAM Roles/Users 리소스 추가
 
 ## 기여
 
@@ -175,7 +307,7 @@ uv run pytest -v && uv run isort --check-only . && uv run black --check .
 
 ## 버전
 
-현재 버전은 1.2.0입니다.
+현재 버전은 1.3.0입니다.
 
 ## 작성자
 

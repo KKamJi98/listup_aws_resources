@@ -7,8 +7,10 @@ AWS Security Groups 전용 조회 스크립트
 - 인바운드/아웃바운드 규칙
 - AnyOpen (0.0.0.0/0, ::/0) 규칙 감지
 - Excel 및 JSON 형식으로 결과 저장
+- 특정 리전 또는 모든 리전 조회 지원
 """
 
+import argparse
 import json
 import os
 from datetime import datetime
@@ -175,8 +177,35 @@ def print_summary(filtered_df: pd.DataFrame):
 
 def main():
     """메인 함수"""
+    # 명령줄 인자 파싱
+    parser = argparse.ArgumentParser(
+        description="AWS Security Groups 조회 스크립트",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+사용 예시:
+  python listup_security_groups.py                           # 모든 리전 조회
+  python listup_security_groups.py --region ap-northeast-2   # 특정 리전 조회
+  python listup_security_groups.py --region us-east-1 us-west-2  # 여러 리전 조회
+        """
+    )
+    parser.add_argument(
+        "--region",
+        dest="regions",
+        nargs="*",
+        help="조회할 AWS 리전명 (여러 개 가능). 지정하지 않으면 모든 리전을 조회합니다."
+    )
+    
+    args = parser.parse_args()
+    regions = args.regions if args.regions else None
+    
     print("🚀 AWS Security Groups 조회 스크립트 시작")
     print("=" * 50)
+    
+    if regions:
+        print(f"🎯 지정된 리전: {', '.join(regions)}")
+    else:
+        print("🌍 모든 리전을 조회합니다.")
+    print()
     
     try:
         # AWS 자격증명 확인
@@ -201,7 +230,7 @@ def main():
     
     try:
         # Security Groups 데이터 수집
-        raw_data, filtered_df = collect_security_groups_data()
+        raw_data, filtered_df = collect_security_groups_data(regions)
         
         # 결과 저장
         save_results(raw_data, filtered_df)
