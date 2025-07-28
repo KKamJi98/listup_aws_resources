@@ -2,10 +2,13 @@
 Tests for SES identity module.
 """
 
+import sys
 from unittest.mock import MagicMock
 
 import pandas as pd
 import pytest
+
+sys.path.insert(0, ".")
 
 from resources.ses_identity import get_filtered_data, get_raw_data
 

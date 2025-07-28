@@ -2,9 +2,12 @@
 Tests for datetime formatting utility functions.
 """
 
+import sys
 from datetime import datetime, timezone
 
 import pytest
+
+sys.path.insert(0, ".")
 
 from utils.datetime_format import format_datetime
 

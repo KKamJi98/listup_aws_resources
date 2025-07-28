@@ -96,7 +96,7 @@ def main():
         args = parser.parse_args()
     regions = args.regions
 
-    timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+    timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S_%f")[:-3]
 
     current_dir = os.path.dirname(__file__)
     data_dir = os.path.join(current_dir, "data")
