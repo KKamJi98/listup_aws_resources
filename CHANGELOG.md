@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.3.0](https://github.com/KKamJi98/listup_aws_resources/compare/v1.2.0...v1.3.0) (2025-07-28)
+
+
+### Features
+
+* Add filtered data export to JSON ([215a4b6](https://github.com/KKamJi98/listup_aws_resources/commit/215a4b695689cc798e46bac3a1f8adf87a179202))
+* **ec2:** Add Security Group information to EC2 instances ([b597b4c](https://github.com/KKamJi98/listup_aws_resources/commit/b597b4c73971cbe4ed72489b493ff6808a59de81))
+* **security:** Add security group rules module and improve file generation ([9f5581e](https://github.com/KKamJi98/listup_aws_resources/commit/9f5581ed8f612dcdce6ebaa854e751ba70ec95ba))
+
 ## [Unreleased]
 
 ### Features
