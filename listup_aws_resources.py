@@ -1,7 +1,7 @@
 import argparse
 import json
 import os
-from datetime import UTC, date, datetime
+from datetime import date, datetime, timezone
 
 import boto3
 import pandas as pd
@@ -260,7 +260,7 @@ def main():
         print("📋 모든 리소스를 조회합니다.")
     print()
 
-    timestamp = datetime.now(UTC).strftime("%Y%m%d_%H%M%S_%f")[:-3]
+    timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S_%f")[:-3]
 
     current_dir = os.path.dirname(__file__)
     data_dir = os.path.join(current_dir, "data")

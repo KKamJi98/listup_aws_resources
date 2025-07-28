@@ -3,7 +3,7 @@ Tests for datetime formatting utility functions.
 """
 
 import sys
-from datetime import UTC, datetime, timezone
+from datetime import datetime, timezone
 
 sys.path.insert(0, ".")
 
@@ -12,7 +12,7 @@ from utils.datetime_format import format_datetime
 
 def test_format_datetime_with_datetime_object():
     """Test formatting a datetime object."""
-    dt = datetime(2023, 5, 15, 12, 30, 45, tzinfo=UTC)
+    dt = datetime(2023, 5, 15, 12, 30, 45, tzinfo=timezone.utc)
     result = format_datetime(dt)
     assert result == "2023-05-15"
 

@@ -3,7 +3,7 @@ Tests for EC2 resource module.
 """
 
 import sys
-from datetime import UTC, datetime, timezone
+from datetime import datetime, timezone
 from unittest.mock import MagicMock
 
 import pandas as pd
@@ -35,7 +35,9 @@ class TestEC2:
                             "State": {"Name": "running"},
                             "PublicIpAddress": "203.0.113.12",
                             "PrivateIpAddress": "10.0.1.12",
-                            "LaunchTime": datetime(2023, 5, 15, 12, 30, 45, tzinfo=UTC),
+                            "LaunchTime": datetime(
+                                2023, 5, 15, 12, 30, 45, tzinfo=timezone.utc
+                            ),
                             "Tags": [{"Key": "Name", "Value": "test-instance"}],
                         }
                     ]
@@ -112,7 +114,9 @@ class TestEC2:
                             "State": {"Name": "running"},
                             "PublicIpAddress": "203.0.113.12",
                             "PrivateIpAddress": "10.0.1.12",
-                            "LaunchTime": datetime(2023, 5, 15, 12, 30, 45, tzinfo=UTC),
+                            "LaunchTime": datetime(
+                                2023, 5, 15, 12, 30, 45, tzinfo=timezone.utc
+                            ),
                             "Tags": [{"Key": "Name", "Value": "test-instance"}],
                         }
                     ]
