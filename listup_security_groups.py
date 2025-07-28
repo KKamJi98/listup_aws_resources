@@ -52,17 +52,23 @@ def collect_security_groups_data(
         tuple: (원시 데이터, 필터링된 데이터프레임)
     """
     if regions is None:
+        print("🌍 사용 가능한 모든 리전을 조회합니다...")
         regions = get_all_regions()
+        print(f"📍 총 {len(regions)}개 리전을 발견했습니다.")
 
     all_raw_data = []
     all_filtered_data = []
 
     session = boto3.Session()
 
-    print("🔍 Security Groups 조회 중...")
+    print("\n🔍 Security Groups 조회 중...")
+    print(f"📊 조회 대상 리전: {len(regions)}개")
 
-    for region in regions:
-        print(f"  📍 {region} 리전 조회 중...")
+    successful_regions = 0
+    total_security_groups = 0
+
+    for i, region in enumerate(regions, 1):
+        print(f"  📍 [{i}/{len(regions)}] {region} 리전 조회 중...")
 
         try:
             # 원시 데이터 수집
@@ -81,12 +87,28 @@ def collect_security_groups_data(
                     filtered_df["Region"] = region
                     all_filtered_data.append(filtered_df)
 
-                print(f"    ✅ {len(raw_data)}개 Security Groups 발견")
+                # AnyOpen 규칙이 있는 Security Groups 수 계산
+                any_open_count = len(
+                    filtered_df[filtered_df["AnyOpenInbound"] == "⚠️ YES"]
+                )
+                any_open_text = (
+                    f" (⚠️ {any_open_count}개 AnyOpen)" if any_open_count > 0 else ""
+                )
+
+                print(f"    ✅ {len(raw_data)}개 Security Groups 발견{any_open_text}")
+                successful_regions += 1
+                total_security_groups += len(raw_data)
             else:
                 print("    ℹ️  Security Groups 없음")
+                successful_regions += 1
 
         except Exception as e:
             print(f"    ❌ {region} 리전 조회 실패: {e}")
+
+    # 결과 요약
+    print("\n📈 조회 완료 요약:")
+    print(f"  ✅ 성공한 리전: {successful_regions}/{len(regions)}")
+    print(f"  🛡️  총 Security Groups: {total_security_groups}개")
 
     # 모든 필터링된 데이터 결합
     if all_filtered_data:
@@ -134,27 +156,42 @@ def save_results(
         output_dir, f"security_groups_filtered_{timestamp}.json"
     )
 
+    print("\n💾 결과 파일 저장 중...")
+
     try:
         # Excel 파일 저장
         if not filtered_df.empty:
             with pd.ExcelWriter(excel_file, engine="openpyxl") as writer:
                 filtered_df.to_excel(writer, sheet_name="Security Groups", index=False)
-            print(f"📊 Excel 파일 저장: {excel_file}")
+            print(f"  📊 Excel 파일 저장 완료: {excel_file}")
+        else:
+            print("  ℹ️  데이터가 없어 Excel 파일을 생성하지 않습니다.")
 
         # 원시 JSON 파일 저장
         with open(raw_json_file, "w", encoding="utf-8") as f:
             json.dump(raw_data, f, indent=2, ensure_ascii=False, default=str)
-        print(f"📄 원시 JSON 파일 저장: {raw_json_file}")
+        print(f"  📄 원시 JSON 파일 저장 완료: {raw_json_file}")
 
         # 필터링된 JSON 파일 저장
         if not filtered_df.empty:
             filtered_json = filtered_df.to_dict("records")
             with open(filtered_json_file, "w", encoding="utf-8") as f:
                 json.dump(filtered_json, f, indent=2, ensure_ascii=False, default=str)
-            print(f"📄 필터링된 JSON 파일 저장: {filtered_json_file}")
+            print(f"  📄 필터링된 JSON 파일 저장 완료: {filtered_json_file}")
+        else:
+            print("  ℹ️  데이터가 없어 필터링된 JSON 파일을 생성하지 않습니다.")
+
+        # 파일 크기 정보
+        if os.path.exists(excel_file):
+            excel_size = os.path.getsize(excel_file) / 1024  # KB
+            print(f"  📏 Excel 파일 크기: {excel_size:.1f} KB")
+
+        raw_json_size = os.path.getsize(raw_json_file) / 1024  # KB
+        print(f"  📏 원시 JSON 파일 크기: {raw_json_size:.1f} KB")
 
     except Exception as e:
-        print(f"❌ 파일 저장 중 오류 발생: {e}")
+        print(f"  ❌ 파일 저장 중 오류 발생: {e}")
+        raise
 
 
 def print_summary(filtered_df: pd.DataFrame):
